@@ -1,0 +1,20 @@
+# Sample scans & exported photos (heavy media - never commit)
+data-photo/
+output/
+exports/
+tmp/
+
+# Rust build artifacts
+/target/
+**/*.rs.bk
+
+# Local AI model weights (downloaded on demand / outside git)
+models/*.onnx
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
