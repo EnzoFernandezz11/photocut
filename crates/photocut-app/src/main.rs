@@ -2,6 +2,7 @@
 
 mod app;
 mod crop_editor;
+mod icons;
 mod worker;
 
 use std::env;

@@ -1,0 +1,3131 @@
+{
+  "input_dir": "data-photo",
+  "output_dir": "data-photo_recortadas",
+  "export_format": "Png",
+  "scans": [
+    {
+      "rel_path": "Escaneo/01/img001.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1238.7825,
+            "cy": 1706.6442,
+            "width": 2051.7495,
+            "height": 2887.555,
+            "angle_deg": 0.2640381
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3683.506,
+            "cy": 1850.9619,
+            "width": 2143.7551,
+            "height": 3078.2668,
+            "angle_deg": -0.7
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1225.2866,
+            "cy": 5126.795,
+            "width": 2083.656,
+            "height": 2926.1309,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3619.2808,
+            "cy": 4787.398,
+            "width": 2393.3198,
+            "height": 2092.841,
+            "angle_deg": -0.6861572
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/01/img002.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2541.231,
+            "cy": 1988.5066,
+            "width": 4138.099,
+            "height": 2982.1272,
+            "angle_deg": 1.0299225
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 2491.9497,
+            "cy": 5345.869,
+            "width": 4154.14,
+            "height": 2983.238,
+            "angle_deg": 1.6776395
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/01/img003.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2643.578,
+            "cy": 2205.136,
+            "width": 4136.523,
+            "height": 2978.7734,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 2620.0637,
+            "cy": 5489.2593,
+            "width": 4144.278,
+            "height": 2984.8254,
+            "angle_deg": 0.59680176
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/01/img004.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2651.2964,
+            "cy": 1958.3923,
+            "width": 4130.526,
+            "height": 2981.0032,
+            "angle_deg": 0.48451233
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 2623.1099,
+            "cy": 5354.5317,
+            "width": 4135.894,
+            "height": 2980.381,
+            "angle_deg": 0.3243103
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/01/img005.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2589.358,
+            "cy": 1873.5408,
+            "width": 4145.9893,
+            "height": 3022.0713,
+            "angle_deg": -0.20758057
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 2597.4878,
+            "cy": 5294.2246,
+            "width": 4147.9155,
+            "height": 2983.0593,
+            "angle_deg": 0.6930542
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/01/img006.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2582.8745,
+            "cy": 2694.336,
+            "width": 4146.5923,
+            "height": 2980.8801,
+            "angle_deg": -0.4291687
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img007.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1126.2402,
+            "cy": 1284.099,
+            "width": 2003.328,
+            "height": 2094.7563,
+            "angle_deg": 0.6610758
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3597.265,
+            "cy": 1353.5302,
+            "width": 1988.0143,
+            "height": 2092.6309,
+            "angle_deg": 0.8916931
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1200.1655,
+            "cy": 3523.889,
+            "width": 2040.2881,
+            "height": 2090.053,
+            "angle_deg": -0.18786621
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3591.055,
+            "cy": 3547.5198,
+            "width": 1984.2294,
+            "height": 2083.8508,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 4,
+          "crop": {
+            "cx": 1209.9122,
+            "cy": 5804.7075,
+            "width": 2002.2582,
+            "height": 2092.7974,
+            "angle_deg": -1.4943237
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 5,
+          "crop": {
+            "cx": 3556.4404,
+            "cy": 5834.457,
+            "width": 1971.8622,
+            "height": 2088.5508,
+            "angle_deg": -0.27545166
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img008.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1328.1313,
+            "cy": 1913.4796,
+            "width": 2096.7686,
+            "height": 3010.132,
+            "angle_deg": 1.108818
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3812.6848,
+            "cy": 2030.4067,
+            "width": 2376.7397,
+            "height": 3397.8936,
+            "angle_deg": 0.9877548
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1352.565,
+            "cy": 5032.91,
+            "width": 2136.1726,
+            "height": 2934.4102,
+            "angle_deg": -0.99346924
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3759.001,
+            "cy": 5313.509,
+            "width": 2111.2502,
+            "height": 3009.1555,
+            "angle_deg": 0.37124634
+          },
+          "turn": "Deg0",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img009.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1419.9849,
+            "cy": 1847.0005,
+            "width": 2089.2969,
+            "height": 2931.29,
+            "angle_deg": 0.23291016
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3747.5696,
+            "cy": 1932.9609,
+            "width": 2074.8452,
+            "height": 2935.6965,
+            "angle_deg": 0.2741404
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1343.7112,
+            "cy": 4958.5654,
+            "width": 2122.31,
+            "height": 2926.4375,
+            "angle_deg": 2.5561523
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3613.7534,
+            "cy": 5075.9585,
+            "width": 2077.1511,
+            "height": 2961.5996,
+            "angle_deg": 1.789917
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img010.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1439.9036,
+            "cy": 1685.947,
+            "width": 2087.477,
+            "height": 2929.6528,
+            "angle_deg": 1.4009781
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3725.3381,
+            "cy": 1881.1428,
+            "width": 2075.8408,
+            "height": 2961.3599,
+            "angle_deg": 1.2986755
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1397.7347,
+            "cy": 5005.204,
+            "width": 2089.804,
+            "height": 2959.7295,
+            "angle_deg": 1.9847031
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3662.2812,
+            "cy": 5036.328,
+            "width": 2075.0942,
+            "height": 2933.3372,
+            "angle_deg": 1.6211472
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img011.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1184.4253,
+            "cy": 1704.191,
+            "width": 2090.3105,
+            "height": 2929.2922,
+            "angle_deg": 0.36108398
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3687.0518,
+            "cy": 1665.5592,
+            "width": 2075.8577,
+            "height": 2930.649,
+            "angle_deg": 0.5354614
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1141.163,
+            "cy": 5031.4556,
+            "width": 2158.906,
+            "height": 2930.7542,
+            "angle_deg": 1.2590332
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3623.4897,
+            "cy": 5011.2646,
+            "width": 2076.0718,
+            "height": 2931.808,
+            "angle_deg": 0.88687134
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img012.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1282.787,
+            "cy": 1860.8281,
+            "width": 2095.3125,
+            "height": 2970.033,
+            "angle_deg": 0.3558731
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3715.4497,
+            "cy": 1960.3795,
+            "width": 2072.3599,
+            "height": 2930.2485,
+            "angle_deg": 1.1135864
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1253.8302,
+            "cy": 5185.363,
+            "width": 2101.6643,
+            "height": 2940.3804,
+            "angle_deg": 0.8550949
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3620.712,
+            "cy": 5128.4077,
+            "width": 2081.0303,
+            "height": 2922.679,
+            "angle_deg": 0.30638885
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img013.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1364.1807,
+            "cy": 2072.749,
+            "width": 2093.281,
+            "height": 2928.0547,
+            "angle_deg": -0.40779114
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3703.039,
+            "cy": 2088.6404,
+            "width": 2074.4749,
+            "height": 2901.5745,
+            "angle_deg": 1.0007019
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1429.9885,
+            "cy": 5243.7783,
+            "width": 2095.3533,
+            "height": 2926.1309,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3693.406,
+            "cy": 5214.532,
+            "width": 2071.9587,
+            "height": 2891.036,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img014.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1298.7892,
+            "cy": 2003.5944,
+            "width": 2086.6372,
+            "height": 2876.8003,
+            "angle_deg": -0.19291687
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3713.7998,
+            "cy": 2025.3933,
+            "width": 2073.314,
+            "height": 2895.4219,
+            "angle_deg": 1.3138885
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1298.3945,
+            "cy": 5232.0796,
+            "width": 2089.5046,
+            "height": 2984.6226,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3679.8796,
+            "cy": 5175.7295,
+            "width": 2073.1172,
+            "height": 2890.4255,
+            "angle_deg": 0.18785095
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img015.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1327.6444,
+            "cy": 1777.3043,
+            "width": 2087.098,
+            "height": 2900.2544,
+            "angle_deg": 0.45837402
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3670.5352,
+            "cy": 1833.0326,
+            "width": 2074.1616,
+            "height": 2896.7258,
+            "angle_deg": -0.29534912
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1352.2146,
+            "cy": 4932.9517,
+            "width": 2088.13,
+            "height": 2838.352,
+            "angle_deg": 0.7805481
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3655.2634,
+            "cy": 4943.8604,
+            "width": 2073.1843,
+            "height": 2905.138,
+            "angle_deg": 0.71616364
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img016.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1163.147,
+            "cy": 1717.6715,
+            "width": 2093.9314,
+            "height": 2942.463,
+            "angle_deg": 1.2844467
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3773.7349,
+            "cy": 1412.5499,
+            "width": 2075.79,
+            "height": 2008.672,
+            "angle_deg": 0.18542258
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 3745.349,
+            "cy": 3615.3704,
+            "width": 2073.0432,
+            "height": 2047.3369,
+            "angle_deg": 1.3078918
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 1249.757,
+            "cy": 5270.51,
+            "width": 2089.424,
+            "height": 2897.6746,
+            "angle_deg": -1.7357025
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 4,
+          "crop": {
+            "cx": 3656.415,
+            "cy": 5860.425,
+            "width": 2117.9114,
+            "height": 2013.9532,
+            "angle_deg": 1.5275269
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img017.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1276.065,
+            "cy": 1832.5548,
+            "width": 2097.1255,
+            "height": 2896.0286,
+            "angle_deg": -0.4896927
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3727.946,
+            "cy": 1868.4695,
+            "width": 2080.8657,
+            "height": 2991.378,
+            "angle_deg": 1.6651077
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1363.0474,
+            "cy": 4999.697,
+            "width": 2098.1716,
+            "height": 2896.0208,
+            "angle_deg": 0.6585388
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3661.2385,
+            "cy": 5006.8867,
+            "width": 2077.8074,
+            "height": 2873.4885,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img018.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1501.4199,
+            "cy": 1857.4268,
+            "width": 2095.5073,
+            "height": 2879.0613,
+            "angle_deg": 0.79132843
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3725.5732,
+            "cy": 1912.6776,
+            "width": 2077.8074,
+            "height": 2931.98,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1539.1415,
+            "cy": 4960.1904,
+            "width": 2093.6526,
+            "height": 2915.3977,
+            "angle_deg": -0.51849365
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3948.5542,
+            "cy": 4966.028,
+            "width": 2093.6829,
+            "height": 2906.5293,
+            "angle_deg": 4.129715
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img019.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1278.2173,
+            "cy": 2008.9807,
+            "width": 2096.6606,
+            "height": 2970.4893,
+            "angle_deg": -1.6272812
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3666.0823,
+            "cy": 2065.539,
+            "width": 2081.424,
+            "height": 2967.2173,
+            "angle_deg": -1.2844391
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1333.6013,
+            "cy": 5164.3765,
+            "width": 2099.4788,
+            "height": 2928.203,
+            "angle_deg": -1.2188721
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3731.4211,
+            "cy": 5152.638,
+            "width": 2082.9414,
+            "height": 2867.8843,
+            "angle_deg": -1.0751266
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img020.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1273.2147,
+            "cy": 1773.6672,
+            "width": 2095.8914,
+            "height": 2929.6182,
+            "angle_deg": -0.5549011
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3701.028,
+            "cy": 1846.8989,
+            "width": 2083.0146,
+            "height": 2925.153,
+            "angle_deg": -1.5551529
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1242.8325,
+            "cy": 5147.2666,
+            "width": 2095.3533,
+            "height": 2943.6785,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3665.5945,
+            "cy": 5224.7695,
+            "width": 2090.2222,
+            "height": 2885.6074,
+            "angle_deg": -1.4840088
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img021.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1363.9602,
+            "cy": 1993.8137,
+            "width": 2093.767,
+            "height": 2961.1992,
+            "angle_deg": -0.3802719
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3767.0298,
+            "cy": 1979.9159,
+            "width": 2080.086,
+            "height": 2900.6401,
+            "angle_deg": -0.16851807
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1360.5189,
+            "cy": 5190.382,
+            "width": 2096.644,
+            "height": 2934.3557,
+            "angle_deg": 0.38580322
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3736.328,
+            "cy": 5147.636,
+            "width": 2080.9426,
+            "height": 2925.315,
+            "angle_deg": 0.22207642
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img022.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1610.0265,
+            "cy": 2132.2808,
+            "width": 2096.1675,
+            "height": 2917.336,
+            "angle_deg": -0.31919098
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3812.1821,
+            "cy": 2198.8035,
+            "width": 2080.3464,
+            "height": 2942.8188,
+            "angle_deg": 0.18786621
+          },
+          "turn": "Deg0",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1630.5394,
+            "cy": 5325.8315,
+            "width": 2095.7827,
+            "height": 2929.0361,
+            "angle_deg": -0.43736267
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3885.231,
+            "cy": 5282.264,
+            "width": 2083.1025,
+            "height": 2861.2795,
+            "angle_deg": 0.4228363
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img023.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1239.9082,
+            "cy": 2085.228,
+            "width": 2089.5046,
+            "height": 2949.5276,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3544.266,
+            "cy": 2137.8706,
+            "width": 2077.8074,
+            "height": 2926.1309,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1275.6606,
+            "cy": 5199.88,
+            "width": 2097.5166,
+            "height": 2885.9265,
+            "angle_deg": 0.7392578
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3509.2893,
+            "cy": 5252.468,
+            "width": 2085.8853,
+            "height": 2948.366,
+            "angle_deg": 0.5562515
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img024.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1293.763,
+            "cy": 1969.5809,
+            "width": 2097.9478,
+            "height": 2995.2515,
+            "angle_deg": 0.67087555
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3707.4624,
+            "cy": 2196.0088,
+            "width": 2078.0544,
+            "height": 2894.0977,
+            "angle_deg": 0.4275818
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1242.2711,
+            "cy": 5213.8306,
+            "width": 2049.5615,
+            "height": 3222.64,
+            "angle_deg": 1.9091523
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3628.1218,
+            "cy": 5331.455,
+            "width": 2077.6448,
+            "height": 2967.6052,
+            "angle_deg": 2.27245
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img025.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1377.7712,
+            "cy": 1851.6873,
+            "width": 2089.7283,
+            "height": 2869.3855,
+            "angle_deg": 0.37693787
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3767.4683,
+            "cy": 2057.6987,
+            "width": 2075.4524,
+            "height": 2940.455,
+            "angle_deg": 1.3937836
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1400.0272,
+            "cy": 5223.798,
+            "width": 2092.5908,
+            "height": 2935.2734,
+            "angle_deg": 1.383667
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3723.649,
+            "cy": 5283.454,
+            "width": 2076.903,
+            "height": 2953.1755,
+            "angle_deg": 1.4906311
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img026.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1309.531,
+            "cy": 1866.8486,
+            "width": 2091.478,
+            "height": 2920.0955,
+            "angle_deg": -1.4320984
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3720.69,
+            "cy": 1944.6515,
+            "width": 2075.0037,
+            "height": 2944.7139,
+            "angle_deg": -0.4620514
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1302.5013,
+            "cy": 5119.3057,
+            "width": 2092.9404,
+            "height": 2915.405,
+            "angle_deg": 1.0076141
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3667.0872,
+            "cy": 5135.5684,
+            "width": 2077.8074,
+            "height": 2873.4885,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img027.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1293.1094,
+            "cy": 1842.5123,
+            "width": 2089.9272,
+            "height": 2919.5627,
+            "angle_deg": -0.6046829
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3649.4006,
+            "cy": 1845.4939,
+            "width": 2078.1008,
+            "height": 2812.9177,
+            "angle_deg": -0.92904663
+          },
+          "turn": "Deg0",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1313.6167,
+            "cy": 5044.776,
+            "width": 2090.2747,
+            "height": 2923.8867,
+            "angle_deg": 0.18664551
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3754.977,
+            "cy": 4991.087,
+            "width": 2076.0256,
+            "height": 2906.033,
+            "angle_deg": 0.92404175
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img028.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1249.3434,
+            "cy": 1897.5857,
+            "width": 2090.9763,
+            "height": 2905.3806,
+            "angle_deg": 0.40348053
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3540.154,
+            "cy": 1965.8713,
+            "width": 2078.278,
+            "height": 2886.1685,
+            "angle_deg": -1.6846848
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1184.3463,
+            "cy": 5109.247,
+            "width": 2095.3533,
+            "height": 2914.4326,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3586.028,
+            "cy": 5085.6416,
+            "width": 2078.0754,
+            "height": 2956.3274,
+            "angle_deg": -1.2453613
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img029.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1281.2704,
+            "cy": 2038.4,
+            "width": 2089.9353,
+            "height": 2911.5637,
+            "angle_deg": -0.5906677
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3610.5146,
+            "cy": 2091.1497,
+            "width": 2076.9126,
+            "height": 2887.2642,
+            "angle_deg": -1.1661606
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1273.9257,
+            "cy": 5169.17,
+            "width": 2091.536,
+            "height": 2975.7375,
+            "angle_deg": 0.6902771
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3611.5251,
+            "cy": 5220.3813,
+            "width": 2083.656,
+            "height": 2937.8293,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img030.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1473.3784,
+            "cy": 1755.8848,
+            "width": 2088.6992,
+            "height": 2910.3281,
+            "angle_deg": 0.8951721
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3741.429,
+            "cy": 1901.968,
+            "width": 2076.3352,
+            "height": 2938.9043,
+            "angle_deg": 0.8636856
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1440.2537,
+            "cy": 4969.046,
+            "width": 2164.5967,
+            "height": 2998.1792,
+            "angle_deg": 0.41220093
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3665.7852,
+            "cy": 4971.6157,
+            "width": 2075.7983,
+            "height": 2890.9287,
+            "angle_deg": 0.7742157
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img031.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1408.9155,
+            "cy": 1871.0454,
+            "width": 2095.3223,
+            "height": 2990.012,
+            "angle_deg": 0.7613678
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3642.375,
+            "cy": 1922.542,
+            "width": 2082.308,
+            "height": 2895.7695,
+            "angle_deg": 1.2777634
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1322.9186,
+            "cy": 4960.3325,
+            "width": 2095.5474,
+            "height": 2938.6965,
+            "angle_deg": 0.63378906
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3596.2688,
+            "cy": 5012.541,
+            "width": 2078.6099,
+            "height": 2901.3699,
+            "angle_deg": 0.7345276
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img032.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1467.6306,
+            "cy": 1998.0846,
+            "width": 2089.107,
+            "height": 2913.6301,
+            "angle_deg": 1.8410187
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3718.202,
+            "cy": 2051.5178,
+            "width": 2078.4517,
+            "height": 2958.7615,
+            "angle_deg": 1.551651
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1423.5735,
+            "cy": 5118.615,
+            "width": 2093.0454,
+            "height": 2868.297,
+            "angle_deg": 0.9093628
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3672.9358,
+            "cy": 5173.588,
+            "width": 2077.8074,
+            "height": 2984.6226,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img033.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1341.0848,
+            "cy": 1909.8486,
+            "width": 2093.804,
+            "height": 2882.7654,
+            "angle_deg": 1.174469
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3589.846,
+            "cy": 2044.4025,
+            "width": 2078.78,
+            "height": 2937.1934,
+            "angle_deg": 2.5261154
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1289.0968,
+            "cy": 4980.1133,
+            "width": 2098.6687,
+            "height": 2915.6724,
+            "angle_deg": 2.1210938
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3538.1125,
+            "cy": 5103.7144,
+            "width": 2082.4985,
+            "height": 2864.5254,
+            "angle_deg": 2.5491638
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img034.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1405.6865,
+            "cy": 1762.1852,
+            "width": 2094.0881,
+            "height": 2897.3948,
+            "angle_deg": 1.1356735
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3782.1458,
+            "cy": 1870.9199,
+            "width": 2078.8115,
+            "height": 3000.5615,
+            "angle_deg": 0.9941864
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1335.6212,
+            "cy": 5052.2017,
+            "width": 2096.1006,
+            "height": 2928.5835,
+            "angle_deg": 1.145752
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3722.6887,
+            "cy": 5091.172,
+            "width": 2080.498,
+            "height": 2877.415,
+            "angle_deg": -0.93917847
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img035.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1568.6582,
+            "cy": 1877.0669,
+            "width": 2099.6409,
+            "height": 2953.892,
+            "angle_deg": 0.9548416
+          },
+          "turn": "Deg0",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3726.1646,
+            "cy": 1913.7595,
+            "width": 2081.723,
+            "height": 2921.5989,
+            "angle_deg": 0.47945404
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1513.8286,
+            "cy": 4946.0073,
+            "width": 2089.433,
+            "height": 2858.304,
+            "angle_deg": 1.2873306
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3724.0095,
+            "cy": 5060.8623,
+            "width": 2076.8484,
+            "height": 2926.3516,
+            "angle_deg": 0.7805481
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img036.jpg",
+      "photos": []
+    },
+    {
+      "rel_path": "Escaneo/02/img037.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1474.6064,
+            "cy": 2015.1464,
+            "width": 2093.4724,
+            "height": 2950.6084,
+            "angle_deg": 1.4100647
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3663.7249,
+            "cy": 2107.62,
+            "width": 2076.7847,
+            "height": 2945.8162,
+            "angle_deg": 0.888237
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1489.1058,
+            "cy": 5042.2954,
+            "width": 2126.8381,
+            "height": 2856.2712,
+            "angle_deg": 1.178772
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3650.77,
+            "cy": 5140.982,
+            "width": 2159.1902,
+            "height": 2905.4722,
+            "angle_deg": -0.20610046
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img038.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1317.0653,
+            "cy": 1830.6686,
+            "width": 2090.8691,
+            "height": 2956.0845,
+            "angle_deg": 0.75884247
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3585.2063,
+            "cy": 1918.5267,
+            "width": 2077.8074,
+            "height": 2920.2817,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1272.087,
+            "cy": 5076.712,
+            "width": 2144.7427,
+            "height": 2949.725,
+            "angle_deg": 1.789917
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 3,
+          "crop": {
+            "cx": 3511.5625,
+            "cy": 5076.8438,
+            "width": 2129.2913,
+            "height": 2889.703,
+            "angle_deg": 0.8814087
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/02/img039.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 1250.5343,
+            "cy": 1740.4263,
+            "width": 2096.7742,
+            "height": 2959.4575,
+            "angle_deg": 0.5509033
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 3594.357,
+            "cy": 1716.9988,
+            "width": 2079.7756,
+            "height": 2927.7778,
+            "angle_deg": 0.3720398
+          },
+          "turn": "Deg180",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 2,
+          "crop": {
+            "cx": 1289.9218,
+            "cy": 5120.863,
+            "width": 2096.673,
+            "height": 2957.3625,
+            "angle_deg": -1.4801788
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/03/img040.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2602.8281,
+            "cy": 1787.5245,
+            "width": 4209.278,
+            "height": 2989.981,
+            "angle_deg": 0.915608
+          },
+          "turn": "Deg270",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        },
+        {
+          "id": 1,
+          "crop": {
+            "cx": 2576.3188,
+            "cy": 5223.306,
+            "width": 4879.298,
+            "height": 3563.6902,
+            "angle_deg": 0.0
+          },
+          "turn": "Deg0",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "rel_path": "Escaneo/03/img041.jpg",
+      "photos": [
+        {
+          "id": 0,
+          "crop": {
+            "cx": 2639.7224,
+            "cy": 2916.4736,
+            "width": 3561.6406,
+            "height": 5114.4097,
+            "angle_deg": 0.919487
+          },
+          "turn": "Deg90",
+          "adjustments": {
+            "auto_color_strength": 0.7,
+            "brightness": 0.0,
+            "contrast": 0.0,
+            "saturation": 0.0,
+            "temperature": 0.0,
+            "tint": 0.0
+          },
+          "status": "Pending"
+        }
+      ]
+    }
+  ]
+}

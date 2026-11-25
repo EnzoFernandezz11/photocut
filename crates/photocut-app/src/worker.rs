@@ -18,7 +18,7 @@ use photocut_core::detect::{DetectConfig, detect_photos};
 use photocut_core::export::{SampleQuality, extract_photo, save_image};
 use photocut_core::orient::OrientationModel;
 use photocut_core::session::{ScanEntry, Session};
-use photocut_core::{Adjustments, ExportFormat, OrientedRect, QuarterTurn};
+use photocut_core::{Adjustments, ExportFormat, OrientedRect, QuarterTurn, ReviewStatus};
 use rayon::prelude::*;
 
 const PREVIEW_MAX_DIM: u32 = 1400;
@@ -26,6 +26,16 @@ const BACKDROP_MAX_DIM: u32 = 1600;
 const AI_CROP_MAX_DIM: u32 = 416;
 const AI_MIN_CONFIDENCE: f32 = 0.70;
 const SESSION_FILENAME: &str = ".photocut.json";
+
+/// Trabajo encolado para procesamiento desatendido por lotes (ej. toda la noche).
+#[derive(Debug, Clone)]
+pub struct QueuedJob {
+    pub job_id: u64,
+    pub input_dir: PathBuf,
+    pub output_dir: PathBuf,
+    pub export_format: ExportFormat,
+    pub use_ai_orient: bool,
+}
 
 /// Comandos enviados desde la interfaz hacia el hilo de trabajo.
 #[derive(Debug)]
@@ -35,6 +45,10 @@ pub enum WorkerCmd {
         output_dir: PathBuf,
         use_ai_orient: bool,
     },
+    StartJobQueue {
+        jobs: Vec<QueuedJob>,
+    },
+    CancelJobQueue,
     RenderPreview {
         seq: u64,
         scan_idx: usize,
@@ -86,6 +100,27 @@ pub enum WorkerEvent {
     },
     ScanningFinished {
         total_scans: usize,
+    },
+    JobQueueProgress {
+        job_id: u64,
+        job_index: usize,
+        total_jobs: usize,
+        indexed_scans: usize,
+        total_scans: usize,
+        total_photos: usize,
+        current_scan_name: String,
+    },
+    JobQueueJobFinished {
+        job_id: u64,
+        total_scans: usize,
+        indexed_scans: usize,
+        total_photos: usize,
+        approved_photos: usize,
+        skipped_photos: usize,
+        error: Option<String>,
+    },
+    JobQueueFinished {
+        cancelled: bool,
     },
     PreviewReady {
         seq: u64,
@@ -212,10 +247,24 @@ impl ActiveFolder {
     }
 }
 
+struct ActiveQueueJob {
+    job_id: u64,
+    job_index: usize,
+    folder: ActiveFolder,
+}
+
+struct ActiveJobQueue {
+    remaining_jobs: VecDeque<QueuedJob>,
+    total_jobs: usize,
+    next_job_index: usize,
+    current_job: Option<ActiveQueueJob>,
+}
+
 struct WorkerState {
     cache: ScanCache,
     ai_model: Option<OrientationModel>,
     folder: Option<ActiveFolder>,
+    job_queue: Option<ActiveJobQueue>,
     evt_tx: Sender<WorkerEvent>,
     repaint_ctx: Option<egui::Context>,
 }
@@ -226,6 +275,7 @@ impl WorkerState {
             cache: ScanCache::new(3),
             ai_model: None,
             folder: None,
+            job_queue: None,
             evt_tx,
             repaint_ctx,
         }
@@ -270,13 +320,14 @@ impl WorkerState {
 
     fn run_loop(&mut self, cmd_rx: Receiver<WorkerCmd>) {
         loop {
-            let has_pending_scan = self
-                .folder
-                .as_ref()
-                .is_some_and(|f| !f.pending_queue.is_empty());
+            let has_pending_work = self.job_queue.is_some()
+                || self
+                    .folder
+                    .as_ref()
+                    .is_some_and(|f| !f.pending_queue.is_empty());
 
             let mut batch = Vec::new();
-            if has_pending_scan {
+            if has_pending_work {
                 loop {
                     match cmd_rx.try_recv() {
                         Ok(cmd) => batch.push(cmd),
@@ -297,11 +348,16 @@ impl WorkerState {
             }
 
             if self.process_command_batch(batch) {
+                self.cache.clear();
                 return;
             }
 
-            // Si no llegaron comandos urgentes, avanzar con el siguiente escaneo pendiente.
-            self.index_next_pending_scan();
+            // Avanzar un paso de trabajo en segundo plano (cola multi-trabajo o carpeta interactiva).
+            if self.job_queue.is_some() {
+                self.step_job_queue();
+            } else {
+                self.index_next_pending_scan();
+            }
         }
     }
 
@@ -342,6 +398,8 @@ impl WorkerState {
                     output_dir,
                     use_ai_orient,
                 } => self.handle_open_folder(input_dir, output_dir, use_ai_orient),
+                WorkerCmd::StartJobQueue { jobs } => self.handle_start_job_queue(jobs),
+                WorkerCmd::CancelJobQueue => self.handle_cancel_job_queue(),
                 WorkerCmd::ExportPhoto {
                     scan_idx,
                     photo_id,
@@ -394,86 +452,24 @@ impl WorkerState {
     }
 
     fn handle_open_folder(&mut self, input_dir: PathBuf, output_dir: PathBuf, use_ai_orient: bool) {
+        if self.job_queue.take().is_some() {
+            self.emit(WorkerEvent::JobQueueFinished { cancelled: true });
+        }
         self.cache.clear();
 
-        let skip_dir = canonical_or_self(&output_dir);
-        let mut scan_paths = Vec::new();
-        collect_scans_recursive(&input_dir, &skip_dir, &mut scan_paths);
-        scan_paths.sort_by(|a, b| natural_cmp(&a.to_string_lossy(), &b.to_string_lossy()));
-
-        let session_path = output_dir.join(SESSION_FILENAME);
-        let existing = if session_path.is_file() {
-            match Session::load(&session_path) {
-                Ok(s) => Some(s),
-                Err(err) => {
-                    self.emit(WorkerEvent::Error {
-                        context: "Sesión previa".to_string(),
-                        message: format!(
-                            "No se pudo leer {}: {err}",
-                            session_path.display()
-                        ),
-                    });
-                    None
-                }
-            }
-        } else {
-            None
-        };
-
-        let export_format = existing
-            .as_ref()
-            .map(|s| s.export_format)
-            .unwrap_or_default();
-
-        let mut existing_map: HashMap<String, ScanEntry> = existing
-            .map(|s| {
-                s.scans
-                    .into_iter()
-                    .map(|e| (normalize_rel(&e.rel_path), e))
-                    .collect()
-            })
-            .unwrap_or_default();
-
-        let mut scans = Vec::with_capacity(scan_paths.len());
-        let mut indexed_flags = Vec::with_capacity(scan_paths.len());
-        let mut pending_queue = VecDeque::new();
-        let mut indexed_count = 0usize;
-
-        for (idx, path) in scan_paths.iter().enumerate() {
-            let rel_path = path
-                .strip_prefix(&input_dir)
-                .unwrap_or(path)
-                .to_string_lossy()
-                .replace('\\', "/");
-
-            if let Some(mut saved_entry) = existing_map.remove(&rel_path) {
-                saved_entry.rel_path = rel_path;
-                scans.push(saved_entry);
-                indexed_flags.push(true);
-                indexed_count += 1;
-            } else {
-                scans.push(ScanEntry {
-                    rel_path,
-                    photos: Vec::new(),
-                });
-                indexed_flags.push(false);
-                pending_queue.push_back(idx);
-            }
+        let (folder, load_err) =
+            build_active_folder(input_dir.clone(), output_dir.clone(), ExportFormat::default(), use_ai_orient);
+        if let Some(err) = load_err {
+            self.emit(WorkerEvent::Error {
+                context: "Sesión previa".to_string(),
+                message: err,
+            });
         }
 
-        let total_scans = scan_paths.len();
-        let folder = ActiveFolder {
-            input_dir: input_dir.clone(),
-            output_dir: output_dir.clone(),
-            export_format,
-            use_ai_orient,
-            scan_paths,
-            scans: scans.clone(),
-            indexed_flags: indexed_flags.clone(),
-            indexed_count,
-            pending_queue,
-        };
-
+        let total_scans = folder.scans.len();
+        let export_format = folder.export_format;
+        let scans = folder.scans.clone();
+        let indexed_flags = folder.indexed_flags.clone();
         let finished_immediately = folder.pending_queue.is_empty();
         self.folder = Some(folder);
 
@@ -491,34 +487,239 @@ impl WorkerState {
         }
     }
 
-    fn index_next_pending_scan(&mut self) {
-        let Some(folder) = self.folder.as_mut() else {
+    fn handle_start_job_queue(&mut self, jobs: Vec<QueuedJob>) {
+        self.folder = None;
+        self.cache.clear();
+        if jobs.is_empty() {
+            self.job_queue = None;
+            self.emit(WorkerEvent::JobQueueFinished { cancelled: false });
             return;
-        };
-        let Some(scan_idx) = folder.pending_queue.pop_front() else {
-            return;
-        };
+        }
+        let total_jobs = jobs.len();
+        self.job_queue = Some(ActiveJobQueue {
+            remaining_jobs: VecDeque::from(jobs),
+            total_jobs,
+            next_job_index: 0,
+            current_job: None,
+        });
+    }
 
-        let scan_path = folder.scan_paths[scan_idx].clone();
-        let rel_path = folder.scans[scan_idx].rel_path.clone();
-        let use_ai = folder.use_ai_orient;
+    fn handle_cancel_job_queue(&mut self) {
+        if self.job_queue.take().is_some() {
+            self.cache.clear();
+            self.emit(WorkerEvent::JobQueueFinished { cancelled: true });
+        }
+    }
 
-        let scan = match self.cache.load_or_get(&scan_path) {
-            Ok(img) => img,
-            Err(err) => {
-                if let Some(f) = self.folder.as_mut() {
-                    f.indexed_flags[scan_idx] = true;
-                    f.indexed_count += 1;
-                }
-                self.emit(WorkerEvent::Error {
-                    context: rel_path,
-                    message: format!("Error al abrir imagen: {err}"),
+    fn step_job_queue(&mut self) {
+        // 1. Si no hay trabajo activo, inicializar el siguiente de la cola.
+        let needs_init = self
+            .job_queue
+            .as_ref()
+            .is_some_and(|q| q.current_job.is_none());
+
+        if needs_init {
+            let next_spec = {
+                let q = self.job_queue.as_mut().expect("active queue");
+                let total_jobs = q.total_jobs;
+                let idx = q.next_job_index;
+                q.remaining_jobs.pop_front().map(|job| {
+                    q.next_job_index += 1;
+                    (job, idx, total_jobs)
+                })
+            };
+
+            let Some((job, job_index, total_jobs)) = next_spec else {
+                self.job_queue = None;
+                self.cache.clear();
+                self.emit(WorkerEvent::JobQueueFinished { cancelled: false });
+                return;
+            };
+
+            // Limpiar caché al iniciar cada trabajo para acotar RAM entre carpetas.
+            self.cache.clear();
+
+            if !job.input_dir.is_dir() {
+                self.emit(WorkerEvent::JobQueueJobFinished {
+                    job_id: job.job_id,
+                    total_scans: 0,
+                    indexed_scans: 0,
+                    total_photos: 0,
+                    approved_photos: 0,
+                    skipped_photos: 0,
+                    error: Some(format!(
+                        "La carpeta de entrada no existe: {}",
+                        job.input_dir.display()
+                    )),
                 });
-                self.check_scanning_finished();
                 return;
             }
+
+            let (folder, _load_err) = build_active_folder(
+                job.input_dir,
+                job.output_dir,
+                job.export_format,
+                job.use_ai_orient,
+            );
+            let total_scans = folder.scans.len();
+            let (total_photos, approved_photos, skipped_photos) =
+                count_session_photos(&folder.scans);
+
+            if total_scans == 0 {
+                self.emit(WorkerEvent::JobQueueJobFinished {
+                    job_id: job.job_id,
+                    total_scans: 0,
+                    indexed_scans: 0,
+                    total_photos: 0,
+                    approved_photos: 0,
+                    skipped_photos: 0,
+                    error: Some(
+                        "No se encontraron imágenes (JPG/PNG/TIFF) en esta carpeta.".to_string(),
+                    ),
+                });
+                return;
+            }
+
+            // Si ya estaba 100% indexado en .photocut.json, finalizar al instante sin re-procesar.
+            if folder.pending_queue.is_empty() {
+                self.cache.clear();
+                self.emit(WorkerEvent::JobQueueJobFinished {
+                    job_id: job.job_id,
+                    total_scans,
+                    indexed_scans: folder.indexed_count,
+                    total_photos,
+                    approved_photos,
+                    skipped_photos,
+                    error: None,
+                });
+                return;
+            }
+
+            let next_name = folder
+                .pending_queue
+                .front()
+                .and_then(|&idx| folder.scans.get(idx))
+                .map(|s| short_scan_name(&s.rel_path))
+                .unwrap_or_default();
+
+            self.emit(WorkerEvent::JobQueueProgress {
+                job_id: job.job_id,
+                job_index,
+                total_jobs,
+                indexed_scans: folder.indexed_count,
+                total_scans,
+                total_photos,
+                current_scan_name: next_name,
+            });
+
+            if let Some(q) = self.job_queue.as_mut() {
+                q.current_job = Some(ActiveQueueJob {
+                    job_id: job.job_id,
+                    job_index,
+                    folder,
+                });
+            }
+            return;
+        }
+
+        // 2. Procesar exactamente UN escaneo del trabajo actual (responde a Cancel/Shutdown entre escaneos).
+        let step_info = {
+            let Some(q) = self.job_queue.as_mut() else {
+                return;
+            };
+            let total_jobs = q.total_jobs;
+            let Some(curr) = q.current_job.as_mut() else {
+                return;
+            };
+            let Some(scan_idx) = curr.folder.pending_queue.pop_front() else {
+                return;
+            };
+            (
+                curr.job_id,
+                curr.job_index,
+                total_jobs,
+                scan_idx,
+                curr.folder.scan_paths[scan_idx].clone(),
+                curr.folder.scans[scan_idx].rel_path.clone(),
+                curr.folder.use_ai_orient,
+            )
         };
 
+        let (job_id, job_index, total_jobs, scan_idx, scan_path, rel_path, use_ai) = step_info;
+        let current_scan_name = short_scan_name(&rel_path);
+
+        let entry_result = self.detect_single_scan(&scan_path, &rel_path, use_ai);
+        let mut step_error: Option<String> = None;
+
+        let (indexed_scans, total_scans, total_photos, approved_photos, skipped_photos, job_done) = {
+            let q = self.job_queue.as_mut().expect("active queue");
+            let curr = q.current_job.as_mut().expect("active queue job");
+
+            match entry_result {
+                Ok((entry, _dims)) => {
+                    curr.folder.scans[scan_idx] = entry;
+                    curr.folder.indexed_flags[scan_idx] = true;
+                    curr.folder.indexed_count += 1;
+                    if let Err(err) = curr.folder.save_indexed_session() {
+                        step_error = Some(format!("Error al guardar sesión: {err}"));
+                    }
+                }
+                Err(err) => {
+                    curr.folder.indexed_flags[scan_idx] = true;
+                    curr.folder.indexed_count += 1;
+                    step_error = Some(format!("Error en {current_scan_name}: {err}"));
+                }
+            }
+
+            let (tot_p, app_p, skip_p) = count_session_photos(&curr.folder.scans);
+            (
+                curr.folder.indexed_count,
+                curr.folder.scans.len(),
+                tot_p,
+                app_p,
+                skip_p,
+                curr.folder.pending_queue.is_empty(),
+            )
+        };
+
+        self.emit(WorkerEvent::JobQueueProgress {
+            job_id,
+            job_index,
+            total_jobs,
+            indexed_scans,
+            total_scans,
+            total_photos,
+            current_scan_name,
+        });
+
+        if job_done {
+            // Liberar RAM de la caché LRU al terminar cada carpeta de la cola.
+            self.cache.clear();
+            if let Some(q) = self.job_queue.as_mut() {
+                q.current_job = None;
+            }
+            self.emit(WorkerEvent::JobQueueJobFinished {
+                job_id,
+                total_scans,
+                indexed_scans,
+                total_photos,
+                approved_photos,
+                skipped_photos,
+                error: step_error,
+            });
+        }
+    }
+
+    fn detect_single_scan(
+        &mut self,
+        scan_path: &Path,
+        rel_path: &str,
+        use_ai: bool,
+    ) -> Result<(ScanEntry, (u32, u32)), String> {
+        let scan = self
+            .cache
+            .load_or_get(scan_path)
+            .map_err(|err| format!("No se pudo abrir imagen: {err}"))?;
         let scan_dims = scan.dimensions();
         let mut photos = detect_photos(&scan, DetectConfig::default());
 
@@ -540,7 +741,42 @@ impl WorkerState {
             }
         }
 
-        let entry = ScanEntry { rel_path, photos };
+        Ok((
+            ScanEntry {
+                rel_path: rel_path.to_string(),
+                photos,
+            },
+            scan_dims,
+        ))
+    }
+
+    fn index_next_pending_scan(&mut self) {
+        let Some(folder) = self.folder.as_mut() else {
+            return;
+        };
+        let Some(scan_idx) = folder.pending_queue.pop_front() else {
+            return;
+        };
+
+        let scan_path = folder.scan_paths[scan_idx].clone();
+        let rel_path = folder.scans[scan_idx].rel_path.clone();
+        let use_ai = folder.use_ai_orient;
+
+        let (entry, scan_dims) = match self.detect_single_scan(&scan_path, &rel_path, use_ai) {
+            Ok(res) => res,
+            Err(err) => {
+                if let Some(f) = self.folder.as_mut() {
+                    f.indexed_flags[scan_idx] = true;
+                    f.indexed_count += 1;
+                }
+                self.emit(WorkerEvent::Error {
+                    context: rel_path,
+                    message: err,
+                });
+                self.check_scanning_finished();
+                return;
+            }
+        };
 
         let (indexed_count, total_scans, save_err) = {
             let f = self.folder.as_mut().expect("active folder");
@@ -760,6 +996,116 @@ impl WorkerState {
             }
         }
     }
+}
+
+fn build_active_folder(
+    input_dir: PathBuf,
+    output_dir: PathBuf,
+    default_format: ExportFormat,
+    use_ai_orient: bool,
+) -> (ActiveFolder, Option<String>) {
+    let skip_dir = canonical_or_self(&output_dir);
+    let mut scan_paths = Vec::new();
+    collect_scans_recursive(&input_dir, &skip_dir, &mut scan_paths);
+    scan_paths.sort_by(|a, b| natural_cmp(&a.to_string_lossy(), &b.to_string_lossy()));
+
+    let session_path = output_dir.join(SESSION_FILENAME);
+    let mut load_err = None;
+    let existing = if session_path.is_file() {
+        match Session::load(&session_path) {
+            Ok(s) => Some(s),
+            Err(err) => {
+                load_err = Some(format!(
+                    "No se pudo leer {}: {err}",
+                    session_path.display()
+                ));
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    let export_format = existing
+        .as_ref()
+        .map(|s| s.export_format)
+        .unwrap_or(default_format);
+
+    let mut existing_map: HashMap<String, ScanEntry> = existing
+        .map(|s| {
+            s.scans
+                .into_iter()
+                .map(|e| (normalize_rel(&e.rel_path), e))
+                .collect()
+        })
+        .unwrap_or_default();
+
+    let mut scans = Vec::with_capacity(scan_paths.len());
+    let mut indexed_flags = Vec::with_capacity(scan_paths.len());
+    let mut pending_queue = VecDeque::new();
+    let mut indexed_count = 0usize;
+
+    for (idx, path) in scan_paths.iter().enumerate() {
+        let rel_path = path
+            .strip_prefix(&input_dir)
+            .unwrap_or(path)
+            .to_string_lossy()
+            .replace('\\', "/");
+
+        if let Some(mut saved_entry) = existing_map.remove(&rel_path) {
+            saved_entry.rel_path = rel_path;
+            scans.push(saved_entry);
+            indexed_flags.push(true);
+            indexed_count += 1;
+        } else {
+            scans.push(ScanEntry {
+                rel_path,
+                photos: Vec::new(),
+            });
+            indexed_flags.push(false);
+            pending_queue.push_back(idx);
+        }
+    }
+
+    (
+        ActiveFolder {
+            input_dir,
+            output_dir,
+            export_format,
+            use_ai_orient,
+            scan_paths,
+            scans,
+            indexed_flags,
+            indexed_count,
+            pending_queue,
+        },
+        load_err,
+    )
+}
+
+fn count_session_photos(scans: &[ScanEntry]) -> (usize, usize, usize) {
+    let mut total = 0usize;
+    let mut approved = 0usize;
+    let mut skipped = 0usize;
+    for scan in scans {
+        total += scan.photos.len();
+        for p in &scan.photos {
+            match p.status {
+                ReviewStatus::Approved => approved += 1,
+                ReviewStatus::Skipped => skipped += 1,
+                ReviewStatus::Pending => {}
+            }
+        }
+    }
+    (total, approved, skipped)
+}
+
+fn short_scan_name(rel_path: &str) -> String {
+    Path::new(rel_path)
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or(rel_path)
+        .to_string()
 }
 
 pub fn full_output_dims(crop: OrientedRect, turn: QuarterTurn) -> (u32, u32) {
@@ -1385,6 +1731,112 @@ mod tests {
             "12-scan stress test took too long: {:?}",
             start.elapsed()
         );
+        let _ = fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn stress_multi_job_queue_runs_and_clears_cache_between_jobs() {
+        let base = std::env::temp_dir().join(format!(
+            "photocut_worker_multi_job_queue_{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&base);
+
+        let mut queued = Vec::new();
+        for job_idx in 1..=3u64 {
+            let in_dir = base.join(format!("album_{job_idx:02}"));
+            let out_dir = base.join(format!("album_{job_idx:02}_recortadas"));
+            fs::create_dir_all(&in_dir).unwrap();
+            for s in 1..=2u8 {
+                let mut img = RgbImage::from_pixel(280, 360, Rgb([252, 252, 252]));
+                for y in 40..320 {
+                    for x in 45..235 {
+                        img.put_pixel(
+                            x,
+                            y,
+                            Rgb([70 + (job_idx as u8) * 30, 90 + s * 25, 130]),
+                        );
+                    }
+                }
+                img.save(in_dir.join(format!("scan_{s:02}.png"))).unwrap();
+            }
+            queued.push(QueuedJob {
+                job_id: job_idx,
+                input_dir: in_dir,
+                output_dir: out_dir,
+                export_format: match job_idx {
+                    1 => ExportFormat::Png,
+                    2 => ExportFormat::Tiff,
+                    _ => ExportFormat::Jpeg { quality: 95 },
+                },
+                use_ai_orient: false,
+            });
+        }
+
+        let mut worker = WorkerHandle::spawn_with_options(None, false);
+        worker.send(WorkerCmd::StartJobQueue {
+            jobs: queued.clone(),
+        });
+
+        let mut finished_ids = Vec::new();
+        let mut progress_events = 0usize;
+        let cancelled = recv_until(&worker, Duration::from_secs(15), |ev| match ev {
+            WorkerEvent::JobQueueProgress { .. } => {
+                progress_events += 1;
+                None
+            }
+            WorkerEvent::JobQueueJobFinished {
+                job_id,
+                total_scans,
+                indexed_scans,
+                total_photos,
+                error,
+                ..
+            } => {
+                assert!(error.is_none(), "job {job_id} unexpected error: {error:?}");
+                assert_eq!(total_scans, 2);
+                assert_eq!(indexed_scans, 2);
+                assert_eq!(total_photos, 2);
+                finished_ids.push(job_id);
+                None
+            }
+            WorkerEvent::JobQueueFinished { cancelled } => Some(cancelled),
+            _ => None,
+        });
+
+        assert!(!cancelled);
+        assert_eq!(finished_ids, vec![1, 2, 3]);
+        assert!(progress_events >= 6);
+
+        // Verificar que las 3 sesiones .photocut.json existen y cargan válidamente con su formato.
+        for job in &queued {
+            let sess_path = job.output_dir.join(SESSION_FILENAME);
+            assert!(sess_path.is_file(), "missing session {}", sess_path.display());
+            let sess = Session::load(&sess_path).unwrap();
+            assert_eq!(sess.scans.len(), 2);
+            assert_eq!(sess.export_format, job.export_format);
+            assert_eq!(sess.scans[0].photos.len(), 1);
+            assert_eq!(sess.scans[1].photos.len(), 1);
+        }
+
+        // Re-ejecutar sobre los mismos trabajos ya indexados debe finalizar instantáneamente sin re-detectar.
+        let t_resume = Instant::now();
+        worker.send(WorkerCmd::StartJobQueue { jobs: queued });
+        let mut resumed_ids = Vec::new();
+        let resumed_cancelled = recv_until(&worker, Duration::from_secs(5), |ev| match ev {
+            WorkerEvent::JobQueueJobFinished { job_id, error, .. } => {
+                assert!(error.is_none());
+                resumed_ids.push(job_id);
+                None
+            }
+            WorkerEvent::JobQueueFinished { cancelled } => Some(cancelled),
+            _ => None,
+        });
+        assert!(!resumed_cancelled);
+        assert_eq!(resumed_ids, vec![1, 2, 3]);
+        assert!(t_resume.elapsed() < Duration::from_secs(2));
+
+        worker.shutdown();
         let _ = fs::remove_dir_all(&base);
     }
 }

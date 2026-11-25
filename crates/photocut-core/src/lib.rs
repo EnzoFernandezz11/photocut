@@ -8,6 +8,7 @@ pub mod cache;
 pub mod detect;
 pub mod enhance;
 pub mod export;
+pub mod jobs;
 pub mod orient;
 pub mod session;
 

@@ -8,19 +8,21 @@ Aplicación de escritorio multiplataforma (**Windows y Linux**) escrita **100% e
 - **Orientación automática con IA local (opcional, 100% offline):** inferencia en Rust puro (`tract-onnx`, sin DLLs externas) con un modelo EfficientNetV2-S de 4 clases (0°/90°/180°/270°). Si no está presente, la app funciona igual con rotación manual (`Q`/`E`).
 - **Restauración automática de color vintage:** estiramiento de niveles por canal (0.3%–99.7% ignorando bordes) + balance suave de gamma de medios tonos para corregir virajes magenta, más controles manuales (brillo, contraste, saturación, temperatura y tinte).
 - **Flujo 100% no destructivo y máxima calidad:** nunca modifica el escaneo original; permite entrar en modo **Re-recortar (`C`)** sobre el escaneo completo en cualquier momento y exporta en una sola pasada bicúbica (*Catmull-Rom*) en **PNG**, **TIFF** sin pérdida o **JPEG** alta calidad (80–100).
+- **Gestor de Trabajos y cola desatendida multi-álbum:** al iniciar sin argumentos abre el menú **Trabajos**, permitiendo cargar carpetas individuales o importar subcarpetas de una sola vez (cada una con su propia salida `<carpeta>_recortadas`) y dejar la cola procesando toda la noche con guardado atómico tras cada escaneo y limpieza de caché entre carpetas.
 - **Memoria acotada y sesiones recuperables:** caché LRU de 3 escaneos en RAM (`ScanCache`) para procesar lotes grandes de 36 MP sin fugas de memoria y guardado atómico en `.photocut.json` para retomar el trabajo sin perder progreso.
 
 ## Cómo ejecutar
 
 ```bash
-# Abrir directamente una carpeta de escaneos (carpeta de salida por defecto: <entrada>/exports)
+# Abrir el Menú Principal (Gestor de Trabajos y cola por lotes)
+cargo run --release -p photocut-app
+
+# O abrir directamente una carpeta de escaneos (salida por defecto: <entrada>_recortadas)
 cargo run --release -p photocut-app -- --input data-photo
 
 # Especificando también carpeta de salida personalizada
 cargo run --release -p photocut-app -- --input data-photo --output ./mis_fotos_exportadas
 ```
-
-También podés iniciar `cargo run --release -p photocut-app` sin argumentos y elegir las carpetas desde la interfaz.
 
 ## Atajos de teclado
 
