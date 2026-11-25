@@ -1,100 +1,166 @@
-# PhotoCut
+<div align="center">
+  <img src="assets/icon.png" alt="PhotoCut Logo" width="128" height="128" />
+  <h1>PhotoCut</h1>
+  <p><strong>Fast, offline desktop app to automatically detect, split, deskew, orient, and restore scanned photos in full resolution — with human-in-the-loop review and non-destructive re-cropping.</strong></p>
 
-Aplicación de escritorio multiplataforma (**Windows y Linux**) escrita **100% en Rust** para separar, enderezar, restaurar color y exportar en máxima calidad (600 DPI) fotos individuales escaneadas sobre fondo blanco, con revisión humana rápida y re-recorte interactivo no destructivo.
+  <p>
+    <img src="https://img.shields.io/badge/version-v0.1.3-3B82F6?style=flat-square" alt="Version v0.1.3" />
+    <img src="https://img.shields.io/badge/built%20with-Rust-E84A27?style=flat-square&logo=rust&logoColor=white" alt="Built with Rust" />
+    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-22C55E?style=flat-square" alt="Windows and Linux" />
+    <img src="https://img.shields.io/badge/license-MIT-6B7280?style=flat-square" alt="MIT License" />
+  </p>
+</div>
 
-## Características principales
+---
 
-- **Detección automática multi-foto y enderezado (*deskew*):** detecta 1, 2, 4, 6 o más fotos por escaneo, compensa sombras de bordes de la tapa del escáner con perfiles locales de fondo 1D y calcula el rectángulo orientado de área mínima.
-- **Orientación automática con IA local (opcional, 100% offline):** inferencia en Rust puro (`tract-onnx`, sin DLLs externas) con un modelo EfficientNetV2-S de 4 clases (0°/90°/180°/270°). Si no está presente, la app funciona igual con rotación manual (`Q`/`E`).
-- **Restauración automática de color vintage:** estiramiento de niveles por canal (0.3%–99.7% ignorando bordes) + balance suave de gamma de medios tonos para corregir virajes magenta, más controles manuales (brillo, contraste, saturación, temperatura y tinte).
-- **Flujo 100% no destructivo y máxima calidad:** nunca modifica el escaneo original; permite entrar en modo **Re-recortar (`C`)** sobre el escaneo completo en cualquier momento y exporta en una sola pasada bicúbica (*Catmull-Rom*) en **PNG**, **TIFF** sin pérdida o **JPEG** alta calidad (80–100).
-- **Gestor de Trabajos y cola desatendida multi-álbum:** al iniciar sin argumentos abre el menú **Trabajos**, permitiendo cargar carpetas individuales o importar subcarpetas de una sola vez (cada una con su propia salida `<carpeta>_recortadas`) y dejar la cola procesando toda la noche con guardado atómico tras cada escaneo y limpieza de caché entre carpetas.
-- **Memoria acotada y sesiones recuperables:** caché LRU de 3 escaneos en RAM (`ScanCache`) para procesar lotes grandes de 36 MP sin fugas de memoria y guardado atómico en `.photocut.json` para retomar el trabajo sin perder progreso.
+## Why PhotoCut?
 
-## Cómo ejecutar
+Digitizing old photo albums on a flatbed scanner usually produces huge 600 DPI sheets with 2 to 6 crooked, upside-down, or faded prints per page. Manually cropping, straightening, and color-correcting hundreds of prints takes hours.
+
+**PhotoCut** automates the repetitive work in pure Rust — with zero external OpenCV or Python dependencies — while keeping a human in control for quick approval, color tweaks, and non-destructive re-cropping before exporting in lossless quality.
+
+<div align="center">
+  <table>
+    <tr>
+      <th width="50%">Input Flatbed Scan + Auto-Detection</th>
+      <th width="50%">Auto-Oriented, Deskewed & Restored Output</th>
+    </tr>
+    <tr>
+      <td align="center"><img src="assets/demo/demo_detected.jpg" alt="Flatbed scan with detected green boxes" width="380" /></td>
+      <td align="center"><img src="assets/demo/demo_output.jpg" alt="Separated, upright and restored photos" width="380" /></td>
+    </tr>
+  </table>
+  <sub>Sample generated with <a href="samples/demo_scan.jpg"><code>samples/demo_scan.jpg</code></a> — 3 crooked prints with mixed 90°/180°/270° rotations and vintage magenta fade, detected in 118 ms.</sub>
+</div>
+
+---
+
+## Key Features
+
+- **2-Stage Multi-Photo Detection & Deskew (`photocut-core`):**
+  - Separable 1D local scanner-lid background modeling handles scanner edge shadow gradients and prints touching the glass margin.
+  - Stage 2 Theil-Sen fine angle refinement and independent 4-side inward trimming remove paper-curl shadows and thin white scanner borders without clipping white skies, walls, or clothing.
+- **100% Offline AI Auto-Orientation (`0° / 90° / 180° / 270°`):**
+  - Pure-Rust ONNX inference via `tract-onnx` (no C++ runtime or DLLs to distribute) automatically rotates sideways and upside-down prints upright. Gracefully optional if the model file is omitted.
+- **Vintage Dye-Fade Restoration & Non-Destructive Adjustments:**
+  - Per-channel percentile auto-levels with gently capped midtone gamma balance rescues faded magenta/red analog prints while keeping modern photos natural.
+  - Real-time sliders for **Auto-Color, Brightness, Contrast, Saturation, Temperature, and Tint**, plus instant **Before / After** toggle (`Space`).
+- **Interactive Non-Destructive Re-Crop (`C`):**
+  - Original high-resolution scans are never modified. Press `C` at any time to view the full scan sheet dimmed in gray with a crisp green frame around the active photo — drag any corner or full edge, rotate freely, zoom up to `6×`, or expand margins to recover clipped borders.
+- **Unattended Multi-Job Queue ("Trabajos"):**
+  - Import multiple album folders in one click, run overnight batch detection & orientation across all jobs, pause/resume anytime via atomic `.photocut.json` session files, and keep RAM flat with a bounded 3-scan LRU cache (`ScanCache`).
+- **Full-Resolution Single-Pass Export:**
+  - Exports directly from the original 600 DPI scan using a single Catmull-Rom bicubic warp (zero double-resampling) in configurable **Lossless PNG**, **Lossless TIFF**, or **High-Quality JPEG (80–100)**.
+- **Cross-Platform Native Binary (Windows + Linux):**
+  - DirectX 12 (`wgpu`) primary on Windows with automatic OpenGL (`glow`) fallback and clear error logging; native OpenGL on Linux.
+
+---
+
+## Quick Start
+
+### Option 1: Portable Release (Recommended for End Users)
+
+1. Download the latest portable archive from **[GitHub Releases](https://github.com/EnzoFernandezz11/photocut/releases)**:
+   - **Windows:** `PhotoCut-vX.Y.Z-windows-x86_64.zip` → unzip and double-click `PhotoCut.exe`.
+   - **Linux:** `PhotoCut-vX.Y.Z-linux-x86_64.tar.gz` → extract and run `./PhotoCut`.
+2. Both portable bundles already include the local AI orientation model (`models/orientation_model_v2_0.9882.onnx`).
+
+### Option 2: Build & Run from Source
+
+**Prerequisites:** Rust toolchain (`rustup`, Rust 1.85+ / Edition 2024). On Ubuntu/Debian Linux, install GUI headers once:
 
 ```bash
-# Abrir el Menú Principal (Gestor de Trabajos y cola por lotes)
-cargo run --release -p photocut-app
-
-# O abrir directamente una carpeta de escaneos (salida por defecto: <entrada>_recortadas)
-cargo run --release -p photocut-app -- --input data-photo
-
-# Especificando también carpeta de salida personalizada
-cargo run --release -p photocut-app -- --input data-photo --output ./mis_fotos_exportadas
+sudo apt-get install -y pkg-config libgtk-3-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libgl1-mesa-dev
 ```
 
-## Atajos de teclado
+Build and launch PhotoCut:
 
-| Tecla | Acción |
+```bash
+git clone https://github.com/EnzoFernandezz11/photocut.git
+cd photocut
+cargo build --release -p photocut-app
+
+# Launch the Main Menu ("Trabajos")
+./target/release/photocut-app
+
+# Or jump directly into the included public sample scan
+./target/release/photocut-app --input samples
+```
+
+#### Optional: Local AI Auto-Orientation Model
+
+Download the MIT-licensed EfficientNetV2-S orientation model (`77 MB`, 98.82% validation accuracy) into `models/` next to the binary (ignored by Git):
+
+```bash
+mkdir -p models
+curl -fSL https://huggingface.co/DuarteBarbosa/deep-image-orientation-detection/resolve/main/orientation_model_v2_0.9882.onnx \
+  -o models/orientation_model_v2_0.9882.onnx
+```
+
+PhotoCut automatically detects `./models/orientation_model_v2_0.9882.onnx`, `<exe_dir>/models/...`, or the `PHOTOCUT_ORIENT_MODEL` environment variable. Without it, the app still runs cleanly with 1-key manual rotation (`Q` / `E`).
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
 | :--- | :--- |
-| `Q` / `E` | Rotar 90° en sentido antihorario / horario |
-| `C` | Activar o salir del modo **Re-recortar** sobre el escaneo original |
-| `Espacio` *(mantener)* | Comparar **Antes / Después** (muestra el recorte original sin ajustes) |
-| `Enter` | **Aprobar y exportar** la foto actual en máxima resolución y avanzar a la siguiente |
-| `Del` *(Supr)* | **Omitir** la foto actual y avanzar |
-| `←` / `→` | Ir a la foto anterior / siguiente |
-| `F` | Restablecer zoom y encuadre de la vista |
+| `Enter` | Approve & export photo in full resolution |
+| `C` | Toggle interactive **Re-Crop** mode on the original scan |
+| `Q` / `E` | Rotate 90° counter-clockwise / clockwise |
+| `Space` *(hold)* | Compare **Before / After** color adjustments |
+| `←` / `→` | Previous / next photo |
+| `Delete` | Skip current photo |
+| `F` | Fit photo / reset full-sheet zoom |
 
-## Modelo opcional de orientación automática (IA local)
+---
 
-PhotoCut busca automáticamente el modelo ONNX (EfficientNetV2-S, 4 clases, licencia MIT) en este orden:
-
-1. Variable de entorno `PHOTOCUT_ORIENT_MODEL` (ruta al archivo `.onnx`).
-2. `./models/orientation_model_v2_0.9882.onnx` (relativo al directorio actual).
-3. `<carpeta_del_ejecutable>/models/orientation_model_v2_0.9882.onnx`.
-
-Para habilitarlo, creá la carpeta `models/` y descargá `orientation_model_v2_0.9882.onnx` allí (la carpeta `models/*.onnx` está excluida en `.gitignore`). Si el archivo no existe, PhotoCut arranca normalmente y permite rotar manualmente con `Q`/`E`.
-
-## Tests y verificación sobre el dataset completo
-
-```bash
-# Ejecutar todos los tests unitarios y de estrés (anti-deadlock, coalescing, LRU, sesiones, IA)
-cargo test --all-targets
-
-# Verificación end-to-end de los 41 escaneos reales + benchmark de estabilidad de RAM (VmRSS) y exports PNG/TIFF/JPEG
-cargo run --release -p photocut-core --example stress_and_verify -- data-photo tmp/final_test_export
-
-# Diagnóstico visual de overlays y muestras de color
-cargo run --release -p photocut-core --example verify_dataset -- data-photo tmp/verify
-
-# Prueba puntual de auto-orientación ONNX
-cargo run --release -p photocut-core --example verify_orient
-```
-
-## Compilación para Linux y Windows
-
-### Linux (Debian / Ubuntu)
-
-Instalar dependencias de ventana/diálogos para `eframe` y `rfd`:
-
-```bash
-sudo apt-get update && sudo apt-get install -y \
-  pkg-config libgtk-3-dev libxcb-render0-dev libxcb-shape0-dev \
-  libxcb-xfixes0-dev libxkbcommon-dev libgl1-mesa-dev
-
-cargo build --release -p photocut-app
-# Binario generado: target/release/photocut-app
-```
-
-### Windows (MSVC / PowerShell)
-
-Requiere Rust estable (`rustup`, toolchain `x86_64-pc-windows-msvc` con Visual Studio Build Tools):
-
-```powershell
-cargo build --release -p photocut-app
-# Binario generado: target\release\photocut-app.exe
-```
-
-## Estructura del repositorio
+## Architecture
 
 ```text
 photocut/
-├── .github/workflows/ci.yml   # CI multiplataforma (Ubuntu + Windows)
-├── Cargo.toml                 # Workspace de Rust
+├── Cargo.toml                        # Rust workspace (single version source of truth)
+├── assets/                           # Custom app icon (SVG / PNG / ICO) & README demo assets
+├── samples/                          # Public sample flatbed scan for testing (demo_scan.jpg)
 ├── crates/
-│   ├── photocut-core/         # Motor puro en Rust (detect, enhance, export, cache, session, orient)
-│   └── photocut-app/          # Interfaz de escritorio egui/eframe + worker en segundo plano
-└── docs/
-    └── PLAN.md                # Arquitectura y análisis del dataset
+│   ├── photocut-core/                # Headless pure-Rust engine (zero GUI dependencies)
+│   │   ├── src/detect.rs             # 2-stage multi-photo segmentation, Theil-Sen deskew & border trim
+│   │   ├── src/orient.rs             # Pure-Rust ONNX auto-orientation (tract-onnx)
+│   │   ├── src/enhance.rs            # Vintage dye-fade auto-levels & non-destructive color LUT
+│   │   ├── src/export.rs             # Single-pass Catmull-Rom bicubic warp + PNG/TIFF/JPEG export
+│   │   ├── src/cache.rs              # Bounded LRU scan cache (strict RAM cap)
+│   │   ├── src/session.rs            # Atomic .photocut.json session persistence
+│   │   └── src/jobs.rs               # Multi-job registry & subfolder album discovery
+│   └── photocut-app/                 # Cross-platform desktop GUI (eframe / egui)
+│       ├── src/app.rs                # Main Menu ("Trabajos") & Darkroom Review workspace
+│       ├── src/crop_editor.rs        # Green interactive corner/edge/rotation overlay with zoom & pan
+│       ├── src/worker.rs             # Non-blocking background worker & unattended batch queue
+│       └── src/icons.rs              # Custom geometric vector icon set
+└── .github/workflows/ci.yml          # Automated Windows + Linux CI & portable Release packaging
 ```
+
+---
+
+## Benchmarks & Verification
+
+Verified against a real archive of **41 flatbed scans (`5100 × 7019 px`, 600 DPI, 150 photos total)**:
+
+| Metric | Result |
+| :--- | :--- |
+| Detection accuracy | **150 / 150 photos**, **0 anomalies** (`~220–470 ms` per 36 MP scan) |
+| White-border elimination (Stage 2) | **`26/150 → 0/150`** photos with ≥70% outer white rim (`8.40% → 1.06%` mean rim) |
+| Local AI auto-orientation | **150 / 150** oriented (`92.34%` avg confidence, `~490 ms/photo` on CPU) |
+| Memory stability (`VmRSS`) | **`+0.4 MB`** drift across 36 full 36 MP scans (`538.1 → 538.5 MB`), **`+0.0 MB`** across 150 slider cycles |
+| Automated tests | **38 / 38 passing** (unit, crop invariants, worker flood/anti-hang, multi-job queue) |
+
+Run the test suite locally:
+
+```bash
+cargo test --all-targets
+```
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE).
