@@ -1261,12 +1261,32 @@ impl PhotoCutApp {
                 ui.horizontal_centered(|ui| {
                     ui.vertical(|ui| {
                         ui.spacing_mut().item_spacing.y = 1.0;
-                        ui.label(
-                            RichText::new("PhotoCut")
-                                .size(17.0)
-                                .strong()
-                                .color(theme::TEXT_PRIMARY),
-                        );
+                        ui.horizontal(|ui| {
+                            ui.label(
+                                RichText::new("PhotoCut")
+                                    .size(17.0)
+                                    .strong()
+                                    .color(theme::TEXT_PRIMARY),
+                            );
+                            let version_label = format!("v{}", env!("CARGO_PKG_VERSION"));
+                            Frame::new()
+                                .fill(theme::BG_CARD)
+                                .stroke(theme::stroke(1.0, theme::BORDER))
+                                .corner_radius(4.0)
+                                .inner_margin(Margin::symmetric(6, 1))
+                                .show(ui, |ui| {
+                                    ui.label(
+                                        RichText::new(&version_label)
+                                            .size(11.0)
+                                            .monospace()
+                                            .color(theme::TEXT_SECONDARY),
+                                    );
+                                })
+                                .response
+                                .on_hover_text(format!(
+                                    "Versión instalada de PhotoCut ({version_label})."
+                                ));
+                        });
                         ui.label(
                             RichText::new(
                                 "Recortá, enderezá y mejorá tus fotos escaneadas en máxima calidad",

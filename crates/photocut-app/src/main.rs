@@ -152,7 +152,7 @@ fn main() -> eframe::Result<()> {
     let cli = parse_cli_args(env::args());
 
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title("PhotoCut")
+        .with_title(format!("PhotoCut v{}", env!("CARGO_PKG_VERSION")))
         .with_inner_size([1360.0, 860.0])
         .with_min_inner_size([960.0, 640.0]);
     if let Some(icon) = load_app_icon() {
