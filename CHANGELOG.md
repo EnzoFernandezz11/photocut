@@ -2,6 +2,13 @@
 
 La versión única de toda la app se define en `[workspace.package].version` dentro de `Cargo.toml` y se muestra automáticamente en la ventana y el menú principal.
 
+## [v0.1.1] - 2026-11-24
+Mejora mayor del algoritmo de recorte automático (Etapa 2 de refinamiento fino):
+
+- **Refinamiento fino de ángulo (Theil-Sen)** sobre el recorte rotado, inmune a esquinas redondeadas o rotas.
+- **Barrido independiente en los 4 bordes** que elimina franjas blancas causadas por sombras de papel curvado sobre el escáner y márgenes blancos impresos, sin morder zonas blancas reales de la foto (cielos, arcos, ropa blanca).
+- **Validación en los 41 escaneos (150 fotos / 600 bordes):** bajó de **26/150 fotos** con borde blanco (≥70%) a **0/150**, manteniendo **0 anomalías** y 36/36 tests pasando.
+
 ## [v0.1.0] - 2026-11-24
 Primera versión funcional (v0) multiplataforma (**Linux y Windows**):
 

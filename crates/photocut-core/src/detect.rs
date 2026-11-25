@@ -138,14 +138,27 @@ pub fn detect_photos(scan: &RgbImage, cfg: DetectConfig) -> Vec<DetectedPhoto> {
             width,
             height,
             angle_deg: normalize_deskew_angle(work_rect.angle_deg),
-        }
-        .expanded(cfg.margin_px);
+        };
 
         rects.push(rect);
     }
 
     // Filtro de seguridad: descartar rectángulos gigantes que envuelven otra foto detectada.
     rects = drop_wrapping_artifacts(rects);
+
+    // Etapa 2: refinamiento de ángulo fino (Theil-Sen) y recorte independiente de bordes blancos/sombras.
+    let base_inset_px = (-cfg.margin_px).clamp(0.0, 6.0);
+    let extra_expand_px = cfg.margin_px.max(0.0);
+    rects = rects
+        .into_par_iter()
+        .map(|coarse| {
+            let mut refined = refine_oriented_rect_with_inset(scan, coarse, base_inset_px);
+            if extra_expand_px > 0.0 {
+                refined = refined.expanded(extra_expand_px);
+            }
+            refined
+        })
+        .collect();
 
     // Ordenar en orden natural de lectura: filas de arriba hacia abajo, columnas izq -> der.
     let row_tolerance = (orig_h as f32) * 0.12;
@@ -716,6 +729,440 @@ fn drop_wrapping_artifacts(rects: Vec<OrientedRect>) -> Vec<OrientedRect> {
         .collect()
 }
 
+const STRIP_MAX_DIM: f32 = 520.0;
+const STRIP_PAD: usize = 12;
+
+struct InspectionStrip {
+    raw: Vec<u8>,
+    w: usize,
+    h: usize,
+    inner_w: usize,
+    inner_h: usize,
+    scale: f32,
+}
+
+impl InspectionStrip {
+    #[inline]
+    fn pixel(&self, x: usize, y: usize) -> [u8; 3] {
+        let i = (y * self.w + x) * 3;
+        [self.raw[i], self.raw[i + 1], self.raw[i + 2]]
+    }
+}
+
+/// Etapa 2: refina ángulo fino (Theil-Sen) y recorta bordes blancos o sombras de papel
+/// curvado en los 4 lados de forma independiente sobre el escaneo original.
+pub fn refine_oriented_rect(scan: &RgbImage, coarse: OrientedRect) -> OrientedRect {
+    refine_oriented_rect_with_inset(scan, coarse, 6.0)
+}
+
+fn refine_oriented_rect_with_inset(
+    scan: &RgbImage,
+    coarse: OrientedRect,
+    base_inset_px: f32,
+) -> OrientedRect {
+    if coarse.width < 24.0 || coarse.height < 24.0 {
+        return coarse;
+    }
+
+    let mut rect = coarse;
+    let mut strip = sample_inspection_strip(scan, rect);
+
+    // Paso 2a: refinamiento robusto de ángulo fino (mediana de pendientes Theil-Sen).
+    if let Some(delta_deg) = estimate_angle_delta(&strip)
+        && delta_deg.abs() >= 0.12
+    {
+        rect.angle_deg = normalize_deskew_angle(rect.angle_deg + delta_deg);
+        strip = sample_inspection_strip(scan, rect);
+    }
+
+    // Paso 2b: recorte independiente por lado de sombras externas y bordes blancos.
+    let trim_l = trim_side_inward(&strip, Side::Left);
+    let trim_r = trim_side_inward(&strip, Side::Right);
+    let trim_t = trim_side_inward(&strip, Side::Top);
+    let trim_b = trim_side_inward(&strip, Side::Bottom);
+
+    let to_orig = |trim_strip: usize, side_orig: f32| -> f32 {
+        if trim_strip > 0 {
+            ((trim_strip as f32 + 1.0) / strip.scale).min(side_orig * 0.075)
+        } else {
+            base_inset_px.min(side_orig * 0.05)
+        }
+    };
+
+    let tl = to_orig(trim_l, rect.width);
+    let tr = to_orig(trim_r, rect.width);
+    let tt = to_orig(trim_t, rect.height);
+    let tb = to_orig(trim_b, rect.height);
+
+    let new_w = (rect.width - tl - tr).max(16.0);
+    let new_h = (rect.height - tt - tb).max(16.0);
+
+    let dlx = (tl - tr) * 0.5;
+    let dly = (tt - tb) * 0.5;
+    let (sin_a, cos_a) = rect.angle_deg.to_radians().sin_cos();
+
+    let (orig_w, orig_h) = scan.dimensions();
+    OrientedRect {
+        cx: (rect.cx + dlx * cos_a - dly * sin_a).clamp(0.0, orig_w as f32),
+        cy: (rect.cy + dlx * sin_a + dly * cos_a).clamp(0.0, orig_h as f32),
+        width: new_w,
+        height: new_h,
+        angle_deg: rect.angle_deg,
+    }
+}
+
+fn sample_inspection_strip(scan: &RgbImage, rect: OrientedRect) -> InspectionStrip {
+    let max_side = rect.width.max(rect.height).max(1.0);
+    let scale = (STRIP_MAX_DIM / max_side).min(1.0);
+    let inner_w = (rect.width * scale).round().max(16.0) as usize;
+    let inner_h = (rect.height * scale).round().max(16.0) as usize;
+    let w = inner_w + STRIP_PAD * 2;
+    let h = inner_h + STRIP_PAD * 2;
+
+    let (sin_a, cos_a) = rect.angle_deg.to_radians().sin_cos();
+    let inv_scale = 1.0 / scale;
+    let cx_s = STRIP_PAD as f32 + (inner_w as f32 - 1.0) * 0.5;
+    let cy_s = STRIP_PAD as f32 + (inner_h as f32 - 1.0) * 0.5;
+
+    let (sw, sh) = scan.dimensions();
+    let sw_f = (sw - 1) as f32;
+    let sh_f = (sh - 1) as f32;
+    let sw_u = sw as usize;
+    let src = scan.as_raw();
+
+    let mut raw = vec![254u8; w * h * 3];
+    for y in 0..h {
+        let ly = (y as f32 - cy_s) * inv_scale;
+        let dst_row = y * w * 3;
+        for x in 0..w {
+            let lx = (x as f32 - cx_s) * inv_scale;
+            let sx = rect.cx + lx * cos_a - ly * sin_a;
+            let sy = rect.cy + lx * sin_a + ly * cos_a;
+
+            if sx < -0.5 || sy < -0.5 || sx > sw_f + 0.5 || sy > sh_f + 0.5 {
+                continue;
+            }
+
+            let sx_c = sx.clamp(0.0, sw_f);
+            let sy_c = sy.clamp(0.0, sh_f);
+            let x0 = sx_c.floor() as usize;
+            let y0 = sy_c.floor() as usize;
+            let x1 = (x0 + 1).min(sw_u - 1);
+            let y1 = (y0 + 1).min(sh as usize - 1);
+            let fx = sx_c - x0 as f32;
+            let fy = sy_c - y0 as f32;
+
+            let i00 = (y0 * sw_u + x0) * 3;
+            let i10 = (y0 * sw_u + x1) * 3;
+            let i01 = (y1 * sw_u + x0) * 3;
+            let i11 = (y1 * sw_u + x1) * 3;
+
+            let dst = dst_row + x * 3;
+            for c in 0..3 {
+                let top = src[i00 + c] as f32 + (src[i10 + c] as f32 - src[i00 + c] as f32) * fx;
+                let bot = src[i01 + c] as f32 + (src[i11 + c] as f32 - src[i01 + c] as f32) * fx;
+                raw[dst + c] = (top + (bot - top) * fy).clamp(0.0, 255.0) as u8;
+            }
+        }
+    }
+
+    InspectionStrip {
+        raw,
+        w,
+        h,
+        inner_w,
+        inner_h,
+        scale,
+    }
+}
+
+#[derive(Clone, Copy)]
+enum Side {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
+#[inline]
+fn rgb_luma(p: [u8; 3]) -> u8 {
+    ((77 * p[0] as u32 + 150 * p[1] as u32 + 29 * p[2] as u32) >> 8) as u8
+}
+
+#[inline]
+fn rgb_chroma(p: [u8; 3]) -> u8 {
+    p[0].max(p[1]).max(p[2]) - p[0].min(p[1]).min(p[2])
+}
+
+#[inline]
+fn rgb_max_diff(a: [u8; 3], b: [u8; 3]) -> u8 {
+    a[0].abs_diff(b[0])
+        .max(a[1].abs_diff(b[1]))
+        .max(a[2].abs_diff(b[2]))
+}
+
+#[inline]
+fn is_outer_blank(p: [u8; 3]) -> bool {
+    rgb_luma(p) >= 200 && rgb_chroma(p) <= 18
+}
+
+fn find_ray_boundary<F: Fn(usize) -> [u8; 3]>(max_d: usize, sample: F) -> Option<usize> {
+    if max_d < 5 {
+        return None;
+    }
+    // Si el borde exterior ya está dentro de una foto vecina o borde, ignorar este rayo.
+    if !is_outer_blank(sample(0)) {
+        return None;
+    }
+
+    let mut run = 0usize;
+    let mut run_start = 0usize;
+    for d in 1..max_d {
+        let p = sample(d);
+        let luma = rgb_luma(p);
+        let chroma = rgb_chroma(p);
+        let blank = luma >= 200 && chroma <= 18;
+        if blank {
+            run = 0;
+            continue;
+        }
+        if run == 0 {
+            run_start = d;
+        }
+        run += 1;
+
+        // Interior real: color marcado (>22), oscuro (<145) sostenido 2px, o >=4px no-blancos seguidos.
+        if (chroma > 22 && run >= 2) || (luma < 145 && run >= 2) || run >= 4 {
+            return Some(run_start);
+        }
+    }
+    None
+}
+
+fn estimate_angle_delta(strip: &InspectionStrip) -> Option<f32> {
+    const RAYS: usize = 32;
+    let mut side_votes: Vec<(f32, usize)> = Vec::with_capacity(4);
+
+    for side in [Side::Top, Side::Bottom, Side::Left, Side::Right] {
+        let (along_len, perp_len, strip_perp) = match side {
+            Side::Top | Side::Bottom => (strip.inner_w, strip.inner_h, strip.h),
+            Side::Left | Side::Right => (strip.inner_h, strip.inner_w, strip.w),
+        };
+        if along_len < 24 || perp_len < 24 {
+            continue;
+        }
+
+        let max_d = (STRIP_PAD + ((perp_len as f32) * 0.14).round() as usize).min(strip_perp - 2);
+        let u_start = STRIP_PAD as f32 + along_len as f32 * 0.12;
+        let u_end = STRIP_PAD as f32 + along_len as f32 * 0.88;
+        let mut pts: Vec<(f32, f32)> = Vec::with_capacity(RAYS);
+
+        for i in 0..RAYS {
+            let t = i as f32 / (RAYS - 1) as f32;
+            let u = (u_start + t * (u_end - u_start)).round() as usize;
+            let maybe_d = match side {
+                Side::Top => find_ray_boundary(max_d, |d| strip.pixel(u, d)),
+                Side::Bottom => find_ray_boundary(max_d, |d| strip.pixel(u, strip.h - 1 - d)),
+                Side::Left => find_ray_boundary(max_d, |d| strip.pixel(d, u)),
+                Side::Right => find_ray_boundary(max_d, |d| strip.pixel(strip.w - 1 - d, u)),
+            };
+
+            if let Some(d) = maybe_d {
+                let v = match side {
+                    Side::Top | Side::Left => d as f32,
+                    Side::Bottom => (strip.h - 1 - d) as f32,
+                    Side::Right => (strip.w - 1 - d) as f32,
+                };
+                pts.push((u as f32, v));
+            }
+        }
+
+        if let Some((slope, inliers)) = theil_sen_fit(&pts) {
+            let delta = match side {
+                Side::Top | Side::Bottom => slope.atan().to_degrees(),
+                Side::Left | Side::Right => -slope.atan().to_degrees(),
+            };
+            if delta.is_finite() && delta.abs() <= 6.0 {
+                side_votes.push((delta, inliers));
+            }
+        }
+    }
+
+    if side_votes.is_empty() {
+        return None;
+    }
+
+    // Mediana ponderada por número de inliers entre los lados válidos.
+    side_votes.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let total_w: usize = side_votes.iter().map(|v| v.1).sum();
+    let half = total_w / 2;
+    let mut acc = 0usize;
+    let mut chosen = side_votes[0].0;
+    for &(angle, w) in &side_votes {
+        acc += w;
+        if acc >= half {
+            chosen = angle;
+            break;
+        }
+    }
+
+    Some(chosen.clamp(-4.0, 4.0))
+}
+
+fn theil_sen_fit(pts: &[(f32, f32)]) -> Option<(f32, usize)> {
+    if pts.len() < 10 {
+        return None;
+    }
+
+    let mut slopes = Vec::with_capacity(pts.len() * pts.len() / 2);
+    for i in 0..pts.len() {
+        for j in (i + 1)..pts.len() {
+            let du = pts[j].0 - pts[i].0;
+            if du.abs() >= 12.0 {
+                slopes.push((pts[j].1 - pts[i].1) / du);
+            }
+        }
+    }
+    if slopes.is_empty() {
+        return None;
+    }
+    slopes.sort_by(|a, b| a.total_cmp(b));
+    let slope = slopes[slopes.len() / 2];
+
+    let mut intercepts: Vec<f32> = pts.iter().map(|&(u, v)| v - slope * u).collect();
+    intercepts.sort_by(|a, b| a.total_cmp(b));
+    let intercept = intercepts[intercepts.len() / 2];
+
+    let mut residuals: Vec<f32> = pts
+        .iter()
+        .map(|&(u, v)| (v - (slope * u + intercept)).abs())
+        .collect();
+    let inliers = residuals.iter().filter(|&&r| r <= 2.0).count();
+    residuals.sort_by(|a, b| a.total_cmp(b));
+    let mad = residuals[residuals.len() / 2];
+
+    if inliers >= 10 && mad <= 1.2 {
+        Some((slope, inliers))
+    } else {
+        None
+    }
+}
+
+fn trim_side_inward(strip: &InspectionStrip, side: Side) -> usize {
+    let (span_inner, perp_inner) = match side {
+        Side::Top | Side::Bottom => (strip.inner_w, strip.inner_h),
+        Side::Left | Side::Right => (strip.inner_h, strip.inner_w),
+    };
+    let max_trim = ((perp_inner as f32) * 0.065).round() as usize;
+    if max_trim == 0 || span_inner < 16 {
+        return 0;
+    }
+
+    // Muestrear el 88% central del lado para ignorar esquinas redondeadas.
+    let margin = ((span_inner as f32) * 0.06).round() as usize;
+    let s_start = STRIP_PAD + margin;
+    let s_end = (STRIP_PAD + span_inner).saturating_sub(margin);
+    if s_end <= s_start + 4 {
+        return 0;
+    }
+    let span_len = s_end - s_start;
+    let scan_limit = (max_trim + 4).min(perp_inner / 3).max(max_trim);
+
+    let mut bright_frac = Vec::with_capacity(scan_limit);
+    let mut neutral_frac = Vec::with_capacity(scan_limit);
+    let mut edge_bright_run_frac = Vec::with_capacity(scan_limit);
+
+    for k in 0..scan_limit {
+        let mut bright = 0usize;
+        let mut neutral = 0usize;
+        let mut left_run = 0usize;
+        let mut left_open = true;
+        let mut cur_run = 0usize;
+        let mut max_run = 0usize;
+
+        let sample_at = |s: usize| -> [u8; 3] {
+            match side {
+                Side::Top => strip.pixel(s, STRIP_PAD + k),
+                Side::Bottom => strip.pixel(s, STRIP_PAD + strip.inner_h - 1 - k),
+                Side::Left => strip.pixel(STRIP_PAD + k, s),
+                Side::Right => strip.pixel(STRIP_PAD + strip.inner_w - 1 - k, s),
+            }
+        };
+
+        let mut prev = sample_at(s_start);
+        for s in s_start..s_end {
+            let p = sample_at(s);
+            let edge_diff = if s == s_start {
+                rgb_max_diff(p, sample_at((s + 1).min(s_end - 1)))
+            } else {
+                rgb_max_diff(p, prev)
+            };
+            prev = p;
+
+            let luma = rgb_luma(p);
+            let chroma = rgb_chroma(p);
+            let is_bright = luma >= 218 && chroma <= 20 && edge_diff <= 16;
+            let is_shadow = luma >= 165 && chroma <= 16 && edge_diff <= 18;
+
+            if is_bright {
+                bright += 1;
+                cur_run += 1;
+                max_run = max_run.max(cur_run);
+                if left_open {
+                    left_run += 1;
+                }
+            } else {
+                left_open = false;
+                cur_run = 0;
+            }
+            if is_bright || is_shadow {
+                neutral += 1;
+            }
+        }
+        let right_run = cur_run;
+
+        let f_len = span_len as f32;
+        bright_frac.push(bright as f32 / f_len);
+        neutral_frac.push(neutral as f32 / f_len);
+        // Racha blanca concentrada en un extremo (cuña de esquina) o tramo continuo dominante.
+        let wedge_run = left_run.max(right_run).max(if max_run * 2 >= span_len { max_run } else { 0 });
+        edge_bright_run_frac.push(wedge_run as f32 / f_len);
+    }
+
+    // Regla principal: avanzar mientras el prefijo sea neutral (>=0.80) o blanco (>=0.78),
+    // siempre que exista al menos una fila/columna claramente blanca (>=0.72) en el prefijo.
+    let mut trim = 0usize;
+    let mut seen_bright = false;
+    for k in 0..max_trim {
+        if neutral_frac[k] < 0.80 && bright_frac[k] < 0.78 {
+            break;
+        }
+        if bright_frac[k] >= 0.72 {
+            seen_bright = true;
+        }
+        if seen_bright {
+            trim = k + 1;
+        }
+    }
+
+    // Residual de cuña diagonal en esquina: hasta 3px extra solo si termina rápido (<0.50 a +3px),
+    // evitando recortar arcos/camisas/cielos blancos que continúan dentro de la foto.
+    let lookahead = (trim + 3).min(scan_limit.saturating_sub(1));
+    let wedge_terminates = bright_frac.get(lookahead).copied().unwrap_or(0.0) < 0.50;
+    if wedge_terminates {
+        let extra_limit = (trim + 3).min(max_trim);
+        for k in trim..extra_limit {
+            if bright_frac[k] >= 0.55 && edge_bright_run_frac[k] >= 0.35 {
+                trim = k + 1;
+            } else {
+                break;
+            }
+        }
+    }
+
+    trim
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -785,6 +1232,98 @@ mod tests {
             (photos[0].crop.height - 180.0).abs() < 8.0,
             "photo stretched vertically: height {}",
             photos[0].crop.height
+        );
+    }
+
+    #[test]
+    fn stage2_trims_drop_shadow_and_white_gap_on_bottom_and_right() {
+        let mut scan = RgbImage::from_pixel(800, 1000, Rgb([252, 252, 252]));
+
+        // Foto real (500x660) en x=100..600, y=100..760.
+        for y in 100..760 {
+            for x in 100..600 {
+                scan.put_pixel(x, y, Rgb([110, 85, 65]));
+            }
+        }
+        // Sombra fina gris de papel curvado separada por una franja blanca de 25px abajo y a la derecha.
+        for y in 785..790 {
+            for x in 100..630 {
+                scan.put_pixel(x, y, Rgb([195, 195, 195]));
+            }
+        }
+        for y in 100..790 {
+            for x in 625..630 {
+                scan.put_pixel(x, y, Rgb([195, 195, 195]));
+            }
+        }
+
+        // Rectángulo grueso (como el hull de Etapa 1 envolviendo foto + hueco blanco + sombra).
+        let coarse = OrientedRect {
+            cx: 365.0,
+            cy: 445.0,
+            width: 530.0,
+            height: 690.0,
+            angle_deg: 0.0,
+        };
+
+        let refined = refine_oriented_rect(&scan, coarse);
+        assert!(
+            (refined.width - 500.0).abs() < 12.0,
+            "expected right drop-shadow + 25px gap trimmed (~500), got width {}",
+            refined.width
+        );
+        assert!(
+            (refined.height - 660.0).abs() < 12.0,
+            "expected bottom drop-shadow + 25px gap trimmed (~660), got height {}",
+            refined.height
+        );
+        let right_edge = refined.cx + refined.width * 0.5;
+        let bottom_edge = refined.cy + refined.height * 0.5;
+        assert!(
+            right_edge <= 601.0 && right_edge >= 590.0,
+            "right edge landed at {right_edge}"
+        );
+        assert!(
+            bottom_edge <= 761.0 && bottom_edge >= 750.0,
+            "bottom edge landed at {bottom_edge}"
+        );
+    }
+
+    #[test]
+    fn stage2_does_not_clip_white_archway_touching_55_percent_of_edge() {
+        let mut scan = RgbImage::from_pixel(800, 1000, Rgb([252, 252, 252]));
+
+        // Foto real (500x660) en x=100..600, y=100..760.
+        for y in 100..760 {
+            for x in 100..600 {
+                scan.put_pixel(x, y, Rgb([60, 110, 155]));
+            }
+        }
+        // Arco / camisa blanca tocando el 55% del borde superior y entrando 150px en la foto.
+        for y in 100..250 {
+            for x in 100..375 {
+                scan.put_pixel(x, y, Rgb([245, 245, 244]));
+            }
+        }
+
+        let coarse = OrientedRect {
+            cx: 350.0,
+            cy: 430.0,
+            width: 500.0,
+            height: 660.0,
+            angle_deg: 0.0,
+        };
+
+        let refined = refine_oriented_rect(&scan, coarse);
+        let top_edge = refined.cy - refined.height * 0.5;
+        assert!(
+            top_edge <= 110.0,
+            "Stage 2 clipped into white archway: top edge moved to {top_edge}"
+        );
+        assert!(
+            refined.height >= 642.0,
+            "Stage 2 shrank photo height excessively: {}",
+            refined.height
         );
     }
 }

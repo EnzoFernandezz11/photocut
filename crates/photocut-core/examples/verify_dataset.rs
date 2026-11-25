@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -7,7 +8,8 @@ use image::imageops::FilterType;
 use image::{Rgb, RgbImage};
 use photocut_core::detect::{DetectConfig, detect_photos};
 use photocut_core::export::{SampleQuality, extract_photo, save_image};
-use photocut_core::{Adjustments, DetectedPhoto, ExportFormat};
+use photocut_core::session::Session;
+use photocut_core::{Adjustments, DetectedPhoto, ExportFormat, OrientedRect, QuarterTurn};
 use rayon::prelude::*;
 
 const REPRESENTATIVE_SCANS: &[&str] = &[
@@ -15,8 +17,25 @@ const REPRESENTATIVE_SCANS: &[&str] = &[
     "img003.jpg",
     "img004.jpg",
     "img007.jpg",
+    "img008.jpg",
+    "img018.jpg",
     "img020.jpg",
+    "img024.jpg",
+    "img030.jpg",
     "img035.jpg",
+    "img037.jpg",
+    "img040.jpg",
+    "img041.jpg",
+];
+
+const SPOTLIGHT_SCANS: &[&str] = &[
+    "img001.jpg",
+    "img007.jpg",
+    "img008.jpg",
+    "img018.jpg",
+    "img024.jpg",
+    "img030.jpg",
+    "img037.jpg",
     "img040.jpg",
     "img041.jpg",
 ];
@@ -27,6 +46,8 @@ struct ScanReport {
     decode_ms: f64,
     detect_ms: f64,
     photos: Vec<DetectedPhoto>,
+    after_edge_white: Vec<[f32; 4]>,
+    before_edge_white: Vec<[f32; 4]>,
     fullres: Option<FullResReport>,
     error: Option<String>,
 }
@@ -46,6 +67,20 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let input_dir = PathBuf::from(args.get(1).map(String::as_str).unwrap_or("data-photo"));
     let output_dir = PathBuf::from(args.get(2).map(String::as_str).unwrap_or("tmp/verify"));
+    let before_map: HashMap<String, Vec<OrientedRect>> = args
+        .get(3)
+        .map(|p| {
+            let sess = Session::load(Path::new(p))
+                .unwrap_or_else(|e| panic!("failed to load before session {p}: {e}"));
+            sess.scans
+                .into_iter()
+                .map(|s| {
+                    let rects = s.photos.into_iter().map(|ph| ph.crop).collect();
+                    (s.rel_path.replace('\\', "/"), rects)
+                })
+                .collect()
+        })
+        .unwrap_or_default();
 
     let mut files = Vec::new();
     collect_images(&input_dir, &mut files);
@@ -81,6 +116,7 @@ fn main() {
                 &overlays_dir,
                 &color_samples_dir,
                 &fullres_dir,
+                &before_map,
             )
         })
         .collect();
@@ -120,6 +156,7 @@ fn process_scan(
     overlays_dir: &Path,
     color_samples_dir: &Path,
     fullres_dir: &Path,
+    before_map: &HashMap<String, Vec<OrientedRect>>,
 ) -> ScanReport {
     let rel_path_buf = path.strip_prefix(input_dir).unwrap_or(path).to_path_buf();
     let rel_path = rel_path_buf.to_string_lossy().replace('\\', "/");
@@ -134,6 +171,8 @@ fn process_scan(
                 decode_ms: t_decode.elapsed().as_secs_f64() * 1000.0,
                 detect_ms: 0.0,
                 photos: Vec::new(),
+                after_edge_white: Vec::new(),
+                before_edge_white: Vec::new(),
                 fullres: None,
                 error: Some(err.to_string()),
             };
@@ -145,6 +184,20 @@ fn process_scan(
     let t_detect = Instant::now();
     let photos = detect_photos(&img, DetectConfig::default());
     let detect_ms = t_detect.elapsed().as_secs_f64() * 1000.0;
+
+    let after_edge_white: Vec<[f32; 4]> = photos
+        .iter()
+        .map(|p| measure_crop_edge_white(&img, p.crop))
+        .collect();
+    let before_edge_white: Vec<[f32; 4]> = before_map
+        .get(&rel_path)
+        .map(|rects| {
+            rects
+                .iter()
+                .map(|&r| measure_crop_edge_white(&img, r))
+                .collect()
+        })
+        .unwrap_or_default();
 
     // Save visual diagnostic overlay (~1000px max side)
     let overlay_name = format!(
@@ -257,9 +310,78 @@ fn process_scan(
         decode_ms,
         detect_ms,
         photos,
+        after_edge_white,
+        before_edge_white,
         fullres,
         error: None,
     }
+}
+
+/// Mide la fracción de píxeles blanco-neutro en la franja exterior (3px) de los 4 lados [T, B, L, R]
+/// sobre una extracción rápida de ~520px (sin ajustes de color).
+fn measure_crop_edge_white(scan: &RgbImage, crop: OrientedRect) -> [f32; 4] {
+    let img = extract_photo(
+        scan,
+        crop,
+        QuarterTurn::Deg0,
+        Adjustments {
+            auto_color_strength: 0.0,
+            ..Default::default()
+        },
+        SampleQuality::Bilinear,
+        Some(520),
+    );
+    let (w, h) = (img.width() as usize, img.height() as usize);
+    if w < 16 || h < 16 {
+        return [0.0; 4];
+    }
+    let raw = img.as_raw();
+    let is_white_px = |x: usize, y: usize| -> bool {
+        let i = (y * w + x) * 3;
+        let (r, g, b) = (raw[i], raw[i + 1], raw[i + 2]);
+        let luma = (77 * r as u32 + 150 * g as u32 + 29 * b as u32) >> 8;
+        let chroma = r.max(g).max(b) - r.min(g).min(b);
+        luma >= 218 && chroma <= 20
+    };
+
+    let mx = (w as f32 * 0.06).round() as usize;
+    let my = (h as f32 * 0.06).round() as usize;
+    let rim = 3usize;
+
+    let mut top = 0usize;
+    let mut bot = 0usize;
+    let x_cnt = (w - 2 * mx) * rim;
+    for k in 0..rim {
+        for x in mx..(w - mx) {
+            if is_white_px(x, k) {
+                top += 1;
+            }
+            if is_white_px(x, h - 1 - k) {
+                bot += 1;
+            }
+        }
+    }
+
+    let mut left = 0usize;
+    let mut right = 0usize;
+    let y_cnt = (h - 2 * my) * rim;
+    for k in 0..rim {
+        for y in my..(h - my) {
+            if is_white_px(k, y) {
+                left += 1;
+            }
+            if is_white_px(w - 1 - k, y) {
+                right += 1;
+            }
+        }
+    }
+
+    [
+        top as f32 / x_cnt.max(1) as f32,
+        bot as f32 / x_cnt.max(1) as f32,
+        left as f32 / y_cnt.max(1) as f32,
+        right as f32 / y_cnt.max(1) as f32,
+    ]
 }
 
 fn render_overlay(scan: &RgbImage, photos: &[DetectedPhoto], max_dim: u32) -> RgbImage {
@@ -509,9 +631,99 @@ fn print_summary(reports: &[ScanReport], total_wall_ms: f64, output_dir: &Path) 
         }
     }
 
+    print_white_border_metrics(reports);
+
     println!();
     println!("Diagnostic outputs:");
     println!("  Overlays:      {}", output_dir.join("overlays").display());
     println!("  Color samples: {}", output_dir.join("color_samples").display());
     println!("  Fullres:       {}", output_dir.join("fullres_sample").display());
+}
+
+fn print_white_border_metrics(reports: &[ScanReport]) {
+    let summarize = |all: &[&[f32; 4]]| -> (usize, usize, usize, f32) {
+        let mut photos_with_white_70 = 0usize;
+        let mut edges_white_70 = 0usize;
+        let mut edges_white_50 = 0usize;
+        let mut sum_edge = 0.0f32;
+        for sides in all {
+            let mut has_70 = false;
+            for &s in sides.iter() {
+                sum_edge += s;
+                if s >= 0.70 {
+                    edges_white_70 += 1;
+                    has_70 = true;
+                }
+                if s >= 0.50 {
+                    edges_white_50 += 1;
+                }
+            }
+            if has_70 {
+                photos_with_white_70 += 1;
+            }
+        }
+        let mean = sum_edge / (all.len().max(1) * 4) as f32;
+        (photos_with_white_70, edges_white_70, edges_white_50, mean)
+    };
+
+    let after_all: Vec<&[f32; 4]> = reports
+        .iter()
+        .flat_map(|r| r.after_edge_white.iter())
+        .collect();
+    let before_all: Vec<&[f32; 4]> = reports
+        .iter()
+        .flat_map(|r| r.before_edge_white.iter())
+        .collect();
+
+    let (ap70, ae70, ae50, amean) = summarize(&after_all);
+    println!();
+    println!("=== White-Border Rim Metrics (outer 3px across {} photos / {} edges) ===", after_all.len(), after_all.len() * 4);
+    if !before_all.is_empty() {
+        let (bp70, be70, be50, bmean) = summarize(&before_all);
+        println!(
+            "  BEFORE (Stage 1): photos w/ white edge (>=70%): {:>3}/{} | edges >=70%: {:>3} | edges >=50%: {:>3} | mean edge white: {:.2}%",
+            bp70,
+            before_all.len(),
+            be70,
+            be50,
+            bmean * 100.0
+        );
+    }
+    println!(
+        "  AFTER  (Stage 2): photos w/ white edge (>=70%): {:>3}/{} | edges >=70%: {:>3} | edges >=50%: {:>3} | mean edge white: {:.2}%",
+        ap70,
+        after_all.len(),
+        ae70,
+        ae50,
+        amean * 100.0
+    );
+
+    if !before_all.is_empty() {
+        println!();
+        println!("  Spotlight Scans (max outer-edge white % across [T,B,L,R]: BEFORE -> AFTER):");
+        for r in reports {
+            let fname = Path::new(&r.rel_path)
+                .file_name()
+                .and_then(|s| s.to_str())
+                .unwrap_or("");
+            if !SPOTLIGHT_SCANS
+                .iter()
+                .any(|&s| s.eq_ignore_ascii_case(fname))
+            {
+                continue;
+            }
+            let pairs: Vec<String> = r
+                .before_edge_white
+                .iter()
+                .zip(r.after_edge_white.iter())
+                .enumerate()
+                .map(|(i, (b, a))| {
+                    let bm = b.iter().copied().fold(0.0f32, f32::max) * 100.0;
+                    let am = a.iter().copied().fold(0.0f32, f32::max) * 100.0;
+                    format!("#{i}: {bm:.0}%->{am:.0}%")
+                })
+                .collect();
+            println!("    {:<24} | {}", r.rel_path, pairs.join(", "));
+        }
+    }
 }
