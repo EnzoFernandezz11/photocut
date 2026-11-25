@@ -1,4 +1,5 @@
 //! PhotoCut — aplicación de escritorio para recorte automático y restauración de fotos escaneadas.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod app;
 mod crop_editor;
@@ -7,6 +8,7 @@ mod worker;
 
 use std::env;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use eframe::egui;
 
@@ -134,14 +136,31 @@ fn parse_cli_args<I: IntoIterator<Item = String>>(args: I) -> CliArgs {
     cli
 }
 
+const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/icon.png");
+
+fn load_app_icon() -> Option<egui::IconData> {
+    let img = image::load_from_memory(APP_ICON_PNG).ok()?.to_rgba8();
+    let (width, height) = img.dimensions();
+    Some(egui::IconData {
+        rgba: img.into_raw(),
+        width,
+        height,
+    })
+}
+
 fn main() -> eframe::Result<()> {
     let cli = parse_cli_args(env::args());
 
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_title("PhotoCut")
+        .with_inner_size([1360.0, 860.0])
+        .with_min_inner_size([960.0, 640.0]);
+    if let Some(icon) = load_app_icon() {
+        viewport = viewport.with_icon(Arc::new(icon));
+    }
+
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_title("PhotoCut")
-            .with_inner_size([1360.0, 860.0])
-            .with_min_inner_size([960.0, 640.0]),
+        viewport,
         ..Default::default()
     };
 
@@ -176,5 +195,13 @@ mod tests {
         let cli = parse_cli_args(["photocut-app".to_string()]);
         assert_eq!(cli.input_dir, None);
         assert_eq!(cli.output_dir, None);
+    }
+
+    #[test]
+    fn embedded_app_icon_decodes_cleanly() {
+        let icon = load_app_icon().expect("embedded icon.png should decode");
+        assert_eq!(icon.width, 256);
+        assert_eq!(icon.height, 256);
+        assert_eq!(icon.rgba.len(), 256 * 256 * 4);
     }
 }

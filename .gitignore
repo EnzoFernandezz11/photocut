@@ -1,5 +1,6 @@
 # Sample scans & exported photos (heavy media - never commit)
 data-photo/
+*_recortadas/
 output/
 exports/
 tmp/
