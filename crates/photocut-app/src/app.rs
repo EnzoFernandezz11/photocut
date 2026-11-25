@@ -151,6 +151,7 @@ pub struct PhotoCutApp {
     preview_meta: Option<PreviewMeta>,
     backdrop_tex: Option<TextureHandle>,
     backdrop_meta: Option<BackdropMeta>,
+    backdrop_requested_scan: Option<usize>,
 
     // Seguimiento de solicitudes en vuelo
     next_preview_seq: u64,
@@ -201,6 +202,7 @@ impl PhotoCutApp {
             preview_meta: None,
             backdrop_tex: None,
             backdrop_meta: None,
+            backdrop_requested_scan: None,
             next_preview_seq: 0,
             exports_in_flight: 0,
             pending_new_crop_recenter: None,
@@ -291,6 +293,7 @@ impl PhotoCutApp {
         self.preview_meta = None;
         self.backdrop_tex = None;
         self.backdrop_meta = None;
+        self.backdrop_requested_scan = None;
         self.registry.refresh_all();
         self.save_registry();
     }
@@ -430,6 +433,7 @@ impl PhotoCutApp {
         self.preview_meta = None;
         self.backdrop_tex = None;
         self.backdrop_meta = None;
+        self.backdrop_requested_scan = None;
         self.pending_new_crop_recenter = None;
         self.status_banner = Some(StatusBanner {
             kind: StatusKind::Info,
@@ -534,9 +538,11 @@ impl PhotoCutApp {
             .backdrop_meta
             .as_ref()
             .is_some_and(|m| m.scan_idx == self.selected_scan)
+            || self.backdrop_requested_scan == Some(self.selected_scan)
         {
             return;
         }
+        self.backdrop_requested_scan = Some(self.selected_scan);
         self.worker.send(WorkerCmd::LoadScanBackdrop {
             scan_idx: self.selected_scan,
         });
@@ -568,7 +574,7 @@ impl PhotoCutApp {
         self.selected_photo_pos = photo_pos;
         if changed {
             self.reset_view();
-            self.crop_editor.clear_drag();
+            self.crop_editor.reset_view();
         }
         if self.recrop_mode {
             self.request_current_backdrop();
@@ -647,7 +653,7 @@ impl PhotoCutApp {
             return;
         }
         self.recrop_mode = !self.recrop_mode;
-        self.crop_editor.clear_drag();
+        self.crop_editor.reset_view();
         self.show_original_held = false;
         if self.recrop_mode {
             self.request_current_backdrop();
@@ -754,7 +760,7 @@ impl PhotoCutApp {
         self.selected_scan = scan_idx;
         self.selected_photo_pos = new_pos;
         self.recrop_mode = true;
-        self.crop_editor.clear_drag();
+        self.crop_editor.reset_view();
         self.save_session();
         self.sync_active_job_to_registry();
         self.request_current_backdrop();
@@ -963,6 +969,9 @@ impl PhotoCutApp {
                     image,
                     orig_dims,
                 } => {
+                    if self.backdrop_requested_scan == Some(scan_idx) {
+                        self.backdrop_requested_scan = None;
+                    }
                     self.scan_dims.insert(scan_idx, orig_dims);
                     if let Some((target_scan, target_id)) = self.pending_new_crop_recenter
                         && target_scan == scan_idx
@@ -1023,6 +1032,8 @@ impl PhotoCutApp {
                 WorkerEvent::Error { context, message } => {
                     if context == "Exportar" {
                         self.exports_in_flight = self.exports_in_flight.saturating_sub(1);
+                    } else if context == "Re-recortar" {
+                        self.backdrop_requested_scan = None;
                     }
                     self.status_banner = Some(StatusBanner {
                         kind: StatusKind::Error,
@@ -1092,7 +1103,11 @@ impl PhotoCutApp {
             self.select_next();
         }
         if f_key {
-            self.reset_view();
+            if self.recrop_mode {
+                self.crop_editor.reset_view();
+            } else {
+                self.reset_view();
+            }
         }
     }
 
@@ -2654,7 +2669,15 @@ impl PhotoCutApp {
     fn show_recrop_viewport(&mut self, ui: &mut egui::Ui) {
         let mut margin_delta: Option<f32> = None;
         let mut restore_original = false;
+        let mut reset_sheet_view = false;
+        let mut focus_photo_view = false;
         let mut finish_recrop = false;
+
+        let backdrop_ready = self
+            .backdrop_meta
+            .as_ref()
+            .filter(|m| m.scan_idx == self.selected_scan)
+            .map(|m| m.orig_dims);
 
         Frame::new()
             .fill(theme::BG_SURFACE)
@@ -2663,12 +2686,12 @@ impl PhotoCutApp {
             .show(ui, |ui| {
                 ui.vertical(|ui| {
                     ui.spacing_mut().item_spacing.y = 6.0;
-                    ui.horizontal_centered(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         ui.spacing_mut().item_spacing.x = 6.0;
 
                         Frame::new()
-                            .fill(Color32::from_rgba_unmultiplied(245, 158, 11, 30))
-                            .stroke(theme::stroke(1.0, theme::RECROP))
+                            .fill(Color32::from_rgba_unmultiplied(34, 197, 94, 28))
+                            .stroke(theme::stroke(1.0, theme::APPROVED))
                             .corner_radius(CornerRadius::same(4))
                             .inner_margin(Margin::symmetric(8, 3))
                             .show(ui, |ui| {
@@ -2676,20 +2699,48 @@ impl PhotoCutApp {
                                     ui.spacing_mut().item_spacing.x = 5.0;
                                     let (r, _) =
                                         ui.allocate_exact_size(Vec2::splat(13.0), Sense::hover());
-                                    draw_icon(ui.painter(), r, Icon::Crop, theme::RECROP);
+                                    draw_icon(ui.painter(), r, Icon::Crop, theme::APPROVED);
                                     ui.label(
                                         RichText::new("RE-RECORTAR")
                                             .size(11.5)
                                             .strong()
-                                            .color(theme::RECROP),
+                                            .color(theme::APPROVED),
                                     );
                                 });
                             });
 
                         if icon_button(
                             ui,
+                            Icon::ZoomFit,
+                            "Hoja completa [F]",
+                            "Muestra toda la hoja escaneada para ver todas las fotos y márgenes (tecla F).",
+                        )
+                        .clicked()
+                        {
+                            reset_sheet_view = true;
+                        }
+
+                        let can_focus =
+                            backdrop_ready.is_some() && self.crop_editor.last_viewport().is_some();
+                        if icon_button_sized(
+                            ui,
+                            Icon::Eye,
+                            "Enfocar foto",
+                            "Acerca cómodamente la vista sobre la foto seleccionada dejando margen gris alrededor.",
+                            Vec2::new(0.0, 28.0),
+                            can_focus,
+                        )
+                        .clicked()
+                        {
+                            focus_photo_view = true;
+                        }
+
+                        ui.separator();
+
+                        if icon_button(
+                            ui,
                             Icon::Expand,
-                            "+20 px margen",
+                            "+20 px",
                             "Agranda el recorte 20 píxeles por lado para recuperar partes de la foto que se hayan cortado de más.",
                         )
                         .clicked()
@@ -2699,7 +2750,7 @@ impl PhotoCutApp {
                         if icon_button(
                             ui,
                             Icon::Shrink,
-                            "-20 px margen",
+                            "-20 px",
                             "Achica el recorte 20 píxeles por lado para quitar filos blancos del borde del escáner.",
                         )
                         .clicked()
@@ -2709,7 +2760,7 @@ impl PhotoCutApp {
                         if icon_button(
                             ui,
                             Icon::Reset,
-                            "Restaurar recorte detectado",
+                            "Restaurar recorte",
                             "Vuelve al recorte original detectado automáticamente por PhotoCut.",
                         )
                         .clicked()
@@ -2723,8 +2774,8 @@ impl PhotoCutApp {
                                 Icon::Check,
                                 "Listo  [C]",
                                 "Termina de ajustar el recorte y vuelve a la vista previa normal (tecla C).",
-                                ButtonStyle::AmberFilled,
-                                Vec2::new(96.0, 28.0),
+                                ButtonStyle::GreenFilled,
+                                Vec2::new(98.0, 28.0),
                                 true,
                             )
                             .clicked()
@@ -2736,13 +2787,26 @@ impl PhotoCutApp {
 
                     ui.label(
                         RichText::new(
-                            "Arrastrá las esquinas o bordes para recuperar partes cortadas, o mové el círculo superior para girar.",
+                            "Arrastrá cualquier esquina o borde del rectángulo verde para ajustar el recorte. Rueda del mouse para hacer zoom; arrastrá fuera del recorte para mover la hoja.",
                         )
                         .size(11.5)
                         .color(theme::TEXT_SECONDARY),
                     );
                 });
             });
+
+        if reset_sheet_view {
+            self.crop_editor.reset_view();
+        }
+        if focus_photo_view
+            && let (Some(orig_dims), Some(viewport), Some(crop)) = (
+                backdrop_ready,
+                self.crop_editor.last_viewport(),
+                self.current_photo().map(|p| p.crop),
+            )
+        {
+            self.crop_editor.focus_on_crop(viewport, orig_dims, crop);
+        }
 
         if let Some(delta) = margin_delta
             && let Some(photo) = self.current_photo_mut()
@@ -2775,6 +2839,7 @@ impl PhotoCutApp {
                 p.crop.angle_deg
             )
         });
+        let recrop_zoom_pct = (self.crop_editor.zoom * 100.0).round() as u32;
 
         egui::TopBottomPanel::bottom("recrop_footer")
             .exact_height(30.0)
@@ -2789,14 +2854,16 @@ impl PhotoCutApp {
                     if let Some(txt) = &footer_text {
                         ui.label(RichText::new(txt).size(12.0).color(theme::TEXT_SECONDARY));
                     }
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        ui.label(
+                            RichText::new(format!("Zoom: {recrop_zoom_pct}%"))
+                                .monospace()
+                                .size(12.0)
+                                .color(theme::TEXT_SECONDARY),
+                        );
+                    });
                 });
             });
-
-        let backdrop_ready = self
-            .backdrop_meta
-            .as_ref()
-            .filter(|m| m.scan_idx == self.selected_scan)
-            .map(|m| m.orig_dims);
 
         match (backdrop_ready, &self.backdrop_tex) {
             (Some(orig_dims), Some(tex)) => {

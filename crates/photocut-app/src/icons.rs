@@ -47,6 +47,7 @@ pub enum ButtonStyle {
     Primary,
     Amber,
     AmberFilled,
+    GreenFilled,
     Danger,
     Subtle,
 }
@@ -610,6 +611,14 @@ fn button_colors(
                 Color32::from_rgb(0xFB, 0xBF, 0x24)
             } else {
                 theme::RECROP
+            };
+            (fill, fill, theme::BG_VIEWPORT)
+        }
+        ButtonStyle::GreenFilled => {
+            let fill = if hovered {
+                Color32::from_rgb(0x4A, 0xDE, 0x80)
+            } else {
+                theme::APPROVED
             };
             (fill, fill, theme::BG_VIEWPORT)
         }

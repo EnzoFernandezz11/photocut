@@ -2,6 +2,13 @@
 
 La versión única de toda la app se define en `[workspace.package].version` dentro de `Cargo.toml` y se muestra automáticamente en la ventana y el menú principal.
 
+## [v0.1.2] - 2026-11-25
+Re-recorte interactivo renovado y mucho más cómodo sobre la hoja completa:
+
+- **Agarre instantáneo de esquinas y bordes completos:** corregido el bug de umbral de arrastre usando `press_origin` exacto, radio de agarre ampliado a **22 px** en esquinas y detección por distancia punto-segmento en los **4 bordes completos** (ya no solo en el punto medio).
+- **Claridad visual inmediata:** marco verde brillante (`#22C55E`, 3 px), 4 círculos grandes en las esquinas con anillo blanco + borde oscuro, máscara gris translúcida más nítida fuera del recorte y contornos secundarios más sutiles.
+- **Zoom y paneo suaves en Re-recortar:** rueda del mouse centrada en el cursor (`1x–6x`), paneo arrastrando fuera del recorte (o con botón medio/derecho), botones **`Hoja completa [F]`** y **`Enfocar foto`** en la barra superior, y eliminación de solicitudes repetidas de fondo mientras carga el escaneo.
+
 ## [v0.1.1] - 2026-11-24
 Mejora mayor del algoritmo de recorte automático (Etapa 2 de refinamiento fino):
 
