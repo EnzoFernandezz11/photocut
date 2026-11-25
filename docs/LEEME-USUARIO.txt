@@ -1,0 +1,26 @@
+PhotoCut — Guía rápida de uso
+=============================
+
+1. Descomprimí TODA esta carpeta en tu PC (por ejemplo en el Escritorio o Documentos).
+   Importante: dejá la carpeta "models" al lado de PhotoCut.exe para que funcione
+   la orientación automática con IA.
+
+2. Hacé doble clic en PhotoCut.exe.
+   (La primera vez Windows SmartScreen puede mostrar "Windows protegió su PC":
+   tocá "Más información" -> "Ejecutar de todas formas".)
+
+3. En el Menú Principal ("Trabajos"):
+   - Tocá "Nuevo trabajo" para elegir una carpeta con fotos escaneadas, o
+   - Tocá "Importar subcarpetas" si tenés varios álbumes separados dentro de una carpeta.
+   - Tocá "Procesar todos" si querés dejarlo recortando y enderezando todo solo
+     (el progreso se guarda después de cada escaneo, podés pausar y seguir otro día).
+
+4. Al revisar cada foto:
+   - [Enter]   OK y Guardar foto en máxima calidad
+   - [C]       Re-recortar (arrastrá cualquier esquina o borde del rectángulo verde)
+   - [Q] / [E] Girar 90° a la izquierda o derecha
+   - [Espacio] Mantener apretado para comparar Antes / Después
+   - [←] / [→] Foto anterior / siguiente
+   - [Del]     Omitir foto
+
+Tus escaneos originales nunca se modifican ni se borran.
