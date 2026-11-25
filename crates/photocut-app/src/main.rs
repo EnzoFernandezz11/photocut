@@ -148,8 +148,62 @@ fn load_app_icon() -> Option<egui::IconData> {
     })
 }
 
-fn main() -> eframe::Result<()> {
-    let cli = parse_cli_args(env::args());
+const RENDERER_FLAG: &str = "--renderer=";
+
+/// Appends a line to `photocut-error.log` next to the exe (or in the temp dir if not writable).
+fn append_log(msg: &str) -> PathBuf {
+    use std::io::Write;
+    let line = format!("[PhotoCut v{}] {msg}\n", env!("CARGO_PKG_VERSION"));
+    let exe_dir_log = env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.join("photocut-error.log")));
+    for path in exe_dir_log
+        .into_iter()
+        .chain([env::temp_dir().join("photocut-error.log")])
+    {
+        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&path)
+            && f.write_all(line.as_bytes()).is_ok()
+        {
+            return path;
+        }
+    }
+    env::temp_dir().join("photocut-error.log")
+}
+
+fn show_fatal(msg: &str) {
+    let _ = rfd::MessageDialog::new()
+        .set_level(rfd::MessageLevel::Error)
+        .set_title("PhotoCut no pudo iniciar")
+        .set_description(msg)
+        .set_buttons(rfd::MessageButtons::Ok)
+        .show();
+}
+
+fn main() {
+    let prev_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        append_log(&format!("PANIC: {info}"));
+        prev_hook(info);
+    }));
+
+    let args: Vec<String> = env::args().collect();
+    let cli = parse_cli_args(args.clone());
+
+    // Windows: DirectX 12 via wgpu works on almost every PC (even without GPU drivers, via WARP).
+    // Other OS: OpenGL. Each falls back to the other one.
+    let forced = args
+        .iter()
+        .find_map(|a| a.strip_prefix(RENDERER_FLAG).map(str::to_owned));
+    let use_wgpu = match forced.as_deref() {
+        Some("wgpu") => true,
+        Some(_) => false,
+        None => cfg!(windows),
+    };
+    let (renderer, name, fallback) = if use_wgpu {
+        (eframe::Renderer::Wgpu, "wgpu", "glow")
+    } else {
+        (eframe::Renderer::Glow, "glow", "wgpu")
+    };
 
     let mut viewport = egui::ViewportBuilder::default()
         .with_title(format!("PhotoCut v{}", env!("CARGO_PKG_VERSION")))
@@ -161,17 +215,45 @@ fn main() -> eframe::Result<()> {
 
     let options = eframe::NativeOptions {
         viewport,
+        renderer,
         ..Default::default()
     };
 
-    eframe::run_native(
-        "PhotoCut",
-        options,
-        Box::new(move |cc| {
-            theme::apply_darkroom_theme(&cc.egui_ctx);
-            Ok(Box::new(PhotoCutApp::new(cc.egui_ctx.clone(), cli)))
-        }),
-    )
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        eframe::run_native(
+            "PhotoCut",
+            options,
+            Box::new(move |cc| {
+                theme::apply_darkroom_theme(&cc.egui_ctx);
+                Ok(Box::new(PhotoCutApp::new(cc.egui_ctx.clone(), cli)))
+            }),
+        )
+    }));
+
+    let err = match result {
+        Ok(Ok(())) => return,
+        Ok(Err(e)) => e.to_string(),
+        Err(_) => "la aplicación se cerró inesperadamente (ver detalle en el log)".to_string(),
+    };
+    let log_path = append_log(&format!("renderer {name} failed: {err}"));
+
+    // winit cannot recreate its event loop in-process, so retry the other renderer in a fresh process.
+    if forced.is_none()
+        && let Ok(exe) = env::current_exe()
+    {
+        let mut retry_args: Vec<String> = args.iter().skip(1).cloned().collect();
+        retry_args.push(format!("{RENDERER_FLAG}{fallback}"));
+        if std::process::Command::new(exe).args(&retry_args).spawn().is_ok() {
+            return;
+        }
+    }
+
+    show_fatal(&format!(
+        "No se pudo abrir la ventana de PhotoCut.\n\nDetalle: {err}\n\n\
+         Se guardó un registro en:\n{}\n\n\
+         Probá actualizar los drivers de video de la PC y volver a abrir PhotoCut.",
+        log_path.display()
+    ));
 }
 
 #[cfg(test)]

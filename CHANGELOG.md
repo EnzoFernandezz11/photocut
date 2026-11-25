@@ -2,6 +2,12 @@
 
 La versión única de toda la app se define en `[workspace.package].version` dentro de `Cargo.toml` y se muestra automáticamente en la ventana y el menú principal.
 
+## [v0.1.3] - 2026-11-25
+Arreglo de arranque en Windows:
+
+- En Windows la ventana ahora se abre con **DirectX 12** (`wgpu`), que funciona incluso en PCs sin drivers de video o máquinas virtuales. Si falla, la app se reinicia sola con OpenGL.
+- Si no puede abrir de ninguna forma, muestra un cartel con el error y guarda `photocut-error.log` al lado del `.exe` (antes se cerraba sin mostrar nada).
+
 ## [v0.1.2] - 2026-11-25
 Re-recorte interactivo renovado y mucho más cómodo sobre la hoja completa:
 

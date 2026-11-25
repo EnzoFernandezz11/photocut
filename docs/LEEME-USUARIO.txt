@@ -24,3 +24,9 @@ PhotoCut — Guía rápida de uso
    - [Del]     Omitir foto
 
 Tus escaneos originales nunca se modifican ni se borran.
+
+Si no abre:
+   - Asegurate de haber DESCOMPRIMIDO la carpeta (no lo abras desde adentro del .zip).
+   - Fijate si el antivirus (Windows Defender) lo puso en cuarentena.
+   - Si aparece un archivo "photocut-error.log" al lado de PhotoCut.exe, mandáselo
+     a quien te pasó el programa.
