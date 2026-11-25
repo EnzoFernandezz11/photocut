@@ -1185,4 +1185,206 @@ mod tests {
         worker.shutdown();
         let _ = fs::remove_dir_all(&base);
     }
+
+    #[test]
+    fn stress_repeated_spawn_flood_and_clean_shutdown() {
+        let base = std::env::temp_dir().join(format!(
+            "photocut_worker_stress_flood_{}",
+            std::process::id()
+        ));
+        let in_dir = base.join("in");
+        let out_dir = base.join("out");
+        fs::create_dir_all(&in_dir).unwrap();
+        make_synthetic_scan(320, 420)
+            .save(in_dir.join("img001.png"))
+            .unwrap();
+
+        for cycle in 0..5usize {
+            let cycle_start = Instant::now();
+            let cycle_out = out_dir.join(format!("cycle_{cycle}"));
+            let mut worker = WorkerHandle::spawn_with_options(None, false);
+
+            worker.send(WorkerCmd::OpenFolder {
+                input_dir: in_dir.clone(),
+                output_dir: cycle_out.clone(),
+                use_ai_orient: false,
+            });
+
+            let entry = recv_until(&worker, Duration::from_secs(5), |ev| match ev {
+                WorkerEvent::FolderOpened {
+                    scans,
+                    indexed_flags,
+                    ..
+                } if indexed_flags.first().copied().unwrap_or(false) => {
+                    scans.into_iter().next()
+                }
+                WorkerEvent::ScanIndexed { entry, .. } => Some(entry),
+                _ => None,
+            });
+            assert_eq!(entry.photos.len(), 1);
+            let photo = entry.photos[0].clone();
+
+            // Ráfaga de 80 RenderPreview + Backdrop + 3 exports (PNG/TIFF/JPEG) + SaveSession.
+            for seq in 1..=80u64 {
+                worker.send(WorkerCmd::RenderPreview {
+                    seq,
+                    scan_idx: 0,
+                    photo_id: photo.id,
+                    crop: photo.crop,
+                    turn: QuarterTurn::Deg0,
+                    adjustments: Adjustments {
+                        brightness: (seq as f32 / 80.0) - 0.5,
+                        ..Default::default()
+                    },
+                    show_original: seq % 10 == 0,
+                });
+                if seq == 20 {
+                    worker.send(WorkerCmd::LoadScanBackdrop { scan_idx: 0 });
+                }
+            }
+
+            let formats = [
+                (ExportFormat::Png, cycle_out.join("out.png")),
+                (ExportFormat::Tiff, cycle_out.join("out.tif")),
+                (ExportFormat::Jpeg { quality: 96 }, cycle_out.join("out.jpg")),
+            ];
+            for (fmt, path) in &formats {
+                worker.send(WorkerCmd::ExportPhoto {
+                    scan_idx: 0,
+                    photo_id: photo.id,
+                    crop: photo.crop,
+                    turn: QuarterTurn::Deg90,
+                    adjustments: Adjustments::default(),
+                    format: *fmt,
+                    output_path: path.clone(),
+                });
+            }
+
+            worker.send(WorkerCmd::SaveSession {
+                session: Session {
+                    input_dir: in_dir.clone(),
+                    output_dir: cycle_out.clone(),
+                    export_format: ExportFormat::Png,
+                    scans: vec![entry],
+                },
+            });
+
+            // En ciclos 0..4 esperar los 3 exports; en el último ciclo probar Shutdown inmediato bajo carga.
+            if cycle < 4 {
+                let mut exports_done = 0usize;
+                recv_until(&worker, Duration::from_secs(5), |ev| {
+                    if let WorkerEvent::ExportDone { .. } = ev {
+                        exports_done += 1;
+                        if exports_done == 3 {
+                            return Some(());
+                        }
+                    }
+                    None
+                });
+                for (_, path) in &formats {
+                    assert!(path.is_file(), "missing export {}", path.display());
+                }
+            }
+
+            worker.shutdown();
+            let elapsed = cycle_start.elapsed();
+            assert!(
+                elapsed < Duration::from_secs(5),
+                "cycle {cycle} took too long ({elapsed:?})"
+            );
+        }
+
+        let _ = fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn stress_cache_stays_bounded_across_many_scans() {
+        let base = std::env::temp_dir().join(format!(
+            "photocut_worker_stress_12scans_{}",
+            std::process::id()
+        ));
+        let in_dir = base.join("in");
+        let out_dir = base.join("out");
+        fs::create_dir_all(&in_dir).unwrap();
+
+        const TOTAL_SCANS: usize = 12;
+        for i in 0..TOTAL_SCANS {
+            let mut img = RgbImage::from_pixel(280, 360, Rgb([252, 252, 252]));
+            let r = 80 + (i as u8 * 10);
+            let g = 140 - (i as u8 * 5);
+            for y in 40..320 {
+                for x in 45..235 {
+                    img.put_pixel(x, y, Rgb([r, g, 120]));
+                }
+            }
+            img.save(in_dir.join(format!("img{:02}.png", i + 1)))
+                .unwrap();
+        }
+
+        let start = Instant::now();
+        let mut worker = WorkerHandle::spawn_with_options(None, false);
+        worker.send(WorkerCmd::OpenFolder {
+            input_dir: in_dir.clone(),
+            output_dir: out_dir.clone(),
+            use_ai_orient: false,
+        });
+
+        let mut indexed_photos: Vec<Option<photocut_core::DetectedPhoto>> = vec![None; TOTAL_SCANS];
+        recv_until(&worker, Duration::from_secs(10), |ev| match ev {
+            WorkerEvent::ScanIndexed {
+                scan_idx, entry, ..
+            } => {
+                assert_eq!(entry.photos.len(), 1);
+                indexed_photos[scan_idx] = Some(entry.photos[0].clone());
+                None
+            }
+            WorkerEvent::ScanningFinished { total_scans } => {
+                assert_eq!(total_scans, TOTAL_SCANS);
+                Some(())
+            }
+            WorkerEvent::Error { context, message } => {
+                panic!("unexpected worker error ({context}): {message}");
+            }
+            _ => None,
+        });
+
+        // Renderizar previews secuencialmente en los 12 escaneos (forzando rotaciones en el ScanCache(3)).
+        for (scan_idx, maybe_photo) in indexed_photos.into_iter().enumerate() {
+            let photo = maybe_photo.expect("scan indexed");
+            let seq = (scan_idx + 1) as u64;
+            worker.send(WorkerCmd::RenderPreview {
+                seq,
+                scan_idx,
+                photo_id: photo.id,
+                crop: photo.crop,
+                turn: QuarterTurn::Deg0,
+                adjustments: Adjustments::default(),
+                show_original: false,
+            });
+            let (got_seq, got_idx, dims) =
+                recv_until(&worker, Duration::from_secs(5), |ev| match ev {
+                    WorkerEvent::PreviewReady {
+                        seq,
+                        scan_idx,
+                        image,
+                        ..
+                    } => Some((seq, scan_idx, image.dimensions())),
+                    WorkerEvent::Error { context, message } => {
+                        panic!("preview error ({context}): {message}");
+                    }
+                    _ => None,
+                });
+            assert_eq!(got_seq, seq);
+            assert_eq!(got_idx, scan_idx);
+            assert!(dims.0 > 0 && dims.1 > 0);
+        }
+
+        worker.shutdown();
+        assert!(
+            start.elapsed() < Duration::from_secs(15),
+            "12-scan stress test took too long: {:?}",
+            start.elapsed()
+        );
+        let _ = fs::remove_dir_all(&base);
+    }
 }
